@@ -74,7 +74,7 @@ export const useApi = () => {
   };
 
    const getSimulation = async (simulationId: string) => {
-    const { data } = await axiosInstance.get(`/api/simulations/${simulationId}`);
+    const { data } = await axiosInstance.get(`${REQUESTS.GET_SIMULATION_BY_ID}${simulationId}`);
     return data;
   };
 
@@ -100,7 +100,7 @@ export const useApi = () => {
     )
     return data  // הפרק החדש
   }
-  return { getUserProgress, getWordBank, getWordMasteries, upsertMastery, getChaptersByType, getAnsweredQuestions, upsertAnsweredQuestion, getSimulationGrades, upsertSimulationGrade, createChapter }
+  return { getUserProgress, getWordBank, getWordMasteries, upsertMastery, getChaptersByType, getAnsweredQuestions, upsertAnsweredQuestion, getSimulationGrades, upsertSimulationGrade, getSimulationOptions, getSimulation, createChapter }
 }
 
 
