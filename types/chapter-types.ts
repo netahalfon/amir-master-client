@@ -16,4 +16,13 @@ export interface QuestionData {
     questions: QuestionData[];
     passage?: string |null;
   }
+
+  export interface SimulationData {
+  _id: string;
+  name: string;
+  type: "Psychometrics" | "Amirnet";
+  order: number;
+  chaptersSection1: ChapterData[];
+  chaptersSection2: ChapterData[];
+}
   
