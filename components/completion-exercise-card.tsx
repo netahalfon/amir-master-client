@@ -1,0 +1,144 @@
+"use client";
+
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { QuestionState } from "@/types/chapter-types";
+import { Button } from "@/components/ui/button";
+import {
+  CheckCircle,
+  XCircle,
+  RotateCcw,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
+import { QuestionData } from "@/types/chapter-types";
+
+interface CompletionExerciseCardProps {
+  currentExercise: QuestionData;
+  selectedAnswer: string | null;
+  questionState: QuestionState;
+  options: string[];
+  sentenceParts: [string, string];
+  currentExerciseIndex: number;
+  totalQuestions: number;
+  handleAnswerSelect: (option: string) => void;
+  handleReset: () => void;
+  handlePreviousExercise: () => void;
+  handleNextExercise: () => void;
+}
+
+export default function CompletionExerciseCard({
+  currentExercise,
+  selectedAnswer,
+  questionState,
+  options,
+  sentenceParts,
+  currentExerciseIndex,
+  totalQuestions: filteredExercisesLength,
+  handleAnswerSelect,
+  handleReset,
+  handlePreviousExercise,
+  handleNextExercise,
+}: CompletionExerciseCardProps) {
+  return (
+    <Card className="border-2">
+      <CardContent className="pt-6">
+        <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
+          {/* question */}
+          <div className="text-lg mb-8">
+            {sentenceParts[0]}
+            <span className="inline-block min-w-[80px] px-2 mx-1 border-b-2 border-primary font-bold">
+              {selectedAnswer || ""}
+            </span>
+            {sentenceParts[1]}
+          </div>
+
+          {/* options */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md">
+            {options.map((option, index) => {
+              const isSelected = selectedAnswer === option;
+              const isCorrectOption = option === currentExercise?.correctOption;
+
+              let buttonClass = "justify-start h-auto py-3 px-4";
+
+              if (selectedAnswer === option) {
+                if (questionState === "correct") {
+                  buttonClass +=
+                    " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
+                } else if (questionState === "incorrect") {
+                  buttonClass +=
+                    " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
+                } else if (questionState === "answered") {
+                  buttonClass +=
+                    " bg-blue-100 text-blue-700 border-blue-500 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700";
+                }
+              }
+
+              return (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className={buttonClass}
+                  onClick={() => handleAnswerSelect(option)}
+                  disabled={isSelected}
+                >
+                  {questionState === "correct" && (
+                    <p className="text-green-500 dark:text-green-400 font-medium">
+                      Correct!
+                    </p>
+                  )}
+                  {questionState === "incorrect" && (
+                    <p className="text-red-500 dark:text-red-400 font-medium">
+                      Try again.
+                    </p>
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+          {/* Answer Feedback */}
+          {selectedAnswer && (
+            <div className="mt-6 flex items-center gap-4">
+              {questionState === "correct" && (
+                <p className="text-green-500 dark:text-green-400 font-medium">
+                  Correct!
+                </p>
+              )}
+              {questionState === "incorrect" && (
+                <p className="text-red-500 dark:text-red-400 font-medium">
+                  Try again.
+                </p>
+              )}
+
+              <Button
+                variant="ghost"
+                className="text-muted-foreground flex items-center gap-2"
+                onClick={handleReset}
+              >
+                <RotateCcw className="h-4 w-4" /> Reset Answer
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex w-full items-center">
+        {currentExerciseIndex > 0 && (
+          <div className="mr-auto">
+            <Button variant="outline" onClick={handlePreviousExercise}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Previous Question
+            </Button>
+          </div>
+        )}
+        {currentExerciseIndex < filteredExercisesLength - 1 && (
+          <div className="ml-auto">
+            <Button variant="outline" onClick={handleNextExercise}>
+              Next Question
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </CardFooter>
+    </Card>
+  );
+}

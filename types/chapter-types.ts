@@ -1,4 +1,5 @@
 // src/types/chapter-types.ts
+export type QuestionState = "unanswered" | "correct" | "incorrect" | "answered";
 
 export interface QuestionData {
     _id: string

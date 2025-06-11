@@ -26,7 +26,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { ProgressBar, QuestionState } from "@/components/progress-bar";
-
+import CompletionExerciseCard from "@/components/completion-exercise-card";
 import { useApi } from "@/services/use-api";
 import type { ChapterData, QuestionData } from "@/types/chapter-types";
 
@@ -56,10 +56,10 @@ export default function SentenceCompletion() {
             name: `Chapter ${chapter.order}`,
           }))
         );
-         // אם לא נבחר פרק, נבחר אוטומטית את הראשון
+        // אם לא נבחר פרק, נבחר אוטומטית את הראשון
         if (!selectedChapter && chapters.length > 0) {
-        setSelectedChapter(chapters[0].order.toString());
-      }
+          setSelectedChapter(chapters[0].order.toString());
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       }
@@ -164,10 +164,14 @@ export default function SentenceCompletion() {
   });
 
   // Split sentence at the blank
-const sentenceParts =
-  currentExercise?.question?.includes("____")
+  const rawParts = currentExercise?.question?.includes("____")
     ? currentExercise.question.split("____")
-    : ["", ""];
+    : [""];
+
+  const sentenceParts: [string, string] = [
+    rawParts[0] || "",
+    rawParts[1] || "",
+  ];
 
   return (
     <div className="container py-8">
@@ -204,94 +208,27 @@ const sentenceParts =
           </div>
 
           {currentExercise ? (
-            <Card className="border-2">
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
-                  {/* question */}
-                  <div className="text-lg mb-8">
-                    {sentenceParts[0]}
-                    <span className="inline-block min-w-[80px] px-2 mx-1 border-b-2 border-primary font-bold">
-                      {selectedAnswer || ""}
-                    </span>
-                    {sentenceParts[1]}
-                  </div>
-                  {/* options */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md">
-                    {options.map((option, index) => {
-                      const isSelected = selectedAnswer === option;
-                      const isCorrectOption =
-                        option === currentExercise?.correctOption;
-                      let buttonClass = "justify-start h-auto py-3 px-4";
-                      if (selectedAnswer === option) {
-                        if (isCorrectOption) {
-                          buttonClass +=
-                            " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
-                        } else {
-                          buttonClass +=
-                            " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
-                        }
-                      }
-                      return (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          className={buttonClass}
-                          onClick={() => handleAnswerSelect(option)}
-                          disabled={isSelected}
-                        >
-                          {option}
-                          {selectedAnswer === option && isCorrect && (
-                            <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
-                          )}
-                          {selectedAnswer === option && isCorrect === false && (
-                            <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
-                          )}
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  {selectedAnswer && (
-                    <div className="mt-6 flex items-center gap-4">
-                      {isCorrect ? (
-                        <p className="text-green-500 dark:text-green-400 font-medium">
-                          Correct!
-                        </p>
-                      ) : (
-                        <p className="text-red-500 dark:text-red-400 font-medium">
-                          Try again.
-                        </p>
-                      )}
-                      <Button
-                        variant="ghost"
-                        className="text-muted-foreground flex items-center gap-2"
-                        onClick={handleReset}
-                      >
-                        <RotateCcw className="h-4 w-4" /> Reset Answer
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-              <CardFooter className="flex w-full items-center">
-                {currentExerciseIndex > 0 && (
-                  <div className="mr-auto">
-                    <Button variant="outline" onClick={handlePreviousExercise}>
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Previous Question
-                    </Button>
-                  </div>
-                )}
-                {currentExerciseIndex < filteredExercises.length - 1 && (
-                  <div className="ml-auto">
-                    <Button variant="outline" onClick={handleNextExercise}>
-                      Next Question
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-              </CardFooter>
-            </Card>
+            <CompletionExerciseCard
+              currentExercise={currentExercise}
+              selectedAnswer={selectedAnswer}
+              handleAnswerSelect={handleAnswerSelect}
+              handleReset={handleReset}
+              handlePreviousExercise={handlePreviousExercise}
+              handleNextExercise={handleNextExercise}
+              questionState={
+                selectedAnswer
+                  ? isCorrect === true
+                    ? "correct"
+                    : isCorrect === false
+                    ? "incorrect"
+                    : "answered"
+                  : "unanswered"
+              }
+              currentExerciseIndex={currentExerciseIndex}
+              totalQuestions={filteredExercises.length}
+              sentenceParts={sentenceParts}
+              options={options}
+            />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <h3 className="text-xl font-medium mb-2">
