@@ -79,17 +79,16 @@ export default function CompletionExerciseCard({
                   variant="outline"
                   className={buttonClass}
                   onClick={() => handleAnswerSelect(option)}
-                  disabled={isSelected}
                 >
-                  {questionState === "correct" && (
-                    <p className="text-green-500 dark:text-green-400 font-medium">
-                      Correct!
-                    </p>
+                  {option}
+                  {selectedAnswer === option && questionState === "correct" && (
+                    <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
                   )}
-                  {questionState === "incorrect" && (
-                    <p className="text-red-500 dark:text-red-400 font-medium">
-                      Try again.
-                    </p>
+                  {selectedAnswer === option && questionState === "incorrect" && (
+                    <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
+                  )}
+                  {selectedAnswer === option && questionState === "answered" && (
+                  <CheckCircle className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
                   )}
                 </Button>
               );
