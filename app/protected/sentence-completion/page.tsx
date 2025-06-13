@@ -215,7 +215,6 @@ export default function SentenceCompletion() {
               handlePreviousExercise={handlePreviousExercise}
               handleNextExercise={handleNextExercise}
               showFeedback={true}
-              currentExerciseIndex={currentExerciseIndex}
               totalQuestions={filteredExercises.length}
             />
           ) : (

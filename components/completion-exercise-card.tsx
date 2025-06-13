@@ -16,7 +16,6 @@ import { QuestionData } from "@/types/chapter-types";
 interface CompletionExerciseCardProps {
   showFeedback: boolean;
   currentExercise: QuestionData;
-  currentExerciseIndex: number;
   totalQuestions: number;
   handleAnswerSelect: (option: string) => void;
   handleReset: () => void;
@@ -27,7 +26,6 @@ interface CompletionExerciseCardProps {
 export default function CompletionExerciseCard({
   showFeedback,
   currentExercise,
-  currentExerciseIndex,
   totalQuestions: filteredExercisesLength,
   handleAnswerSelect,
   handleReset,
@@ -38,7 +36,6 @@ export default function CompletionExerciseCard({
 const selectedAnswer = currentExercise.selectedOption || null;
 // Determine the question state based on the current exercise and feedback visibility
 let questionState: QuestionState;
-
 if (currentExercise.selectedOption === null) {
   questionState = "unanswered";
 } else if (!showFeedback) {
@@ -150,7 +147,7 @@ if (currentExercise.selectedOption === null) {
       </CardContent>
 
       <CardFooter className="flex w-full items-center">
-        {currentExerciseIndex > 0 && (
+        { currentExercise.order-1> 0 && (
           <div className="mr-auto">
             <Button variant="outline" onClick={handlePreviousExercise}>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -158,7 +155,7 @@ if (currentExercise.selectedOption === null) {
             </Button>
           </div>
         )}
-        {currentExerciseIndex < filteredExercisesLength - 1 && (
+        {currentExercise.order- 1 < filteredExercisesLength - 1 && (
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
               Next Question

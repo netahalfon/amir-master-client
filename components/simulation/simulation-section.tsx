@@ -154,7 +154,6 @@ const handleNextExercise = () => {
                       handlePreviousExercise={handlePreviousExercise}
                       handleNextExercise={handleNextExercise}
                       showFeedback={false}
-                      currentExerciseIndex={currentQuestionIndex}
                       totalQuestions={22}
                     />
       )}
