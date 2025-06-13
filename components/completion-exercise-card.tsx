@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   XCircle,
+  Dot,
   RotateCcw,
   ArrowLeft,
   ArrowRight,
@@ -13,10 +14,8 @@ import {
 import { QuestionData } from "@/types/chapter-types";
 
 interface CompletionExerciseCardProps {
+  showFeedback: boolean;
   currentExercise: QuestionData;
-  questionState: QuestionState;
-  options: string[];
-  sentenceParts: [string, string];
   currentExerciseIndex: number;
   totalQuestions: number;
   handleAnswerSelect: (option: string) => void;
@@ -26,10 +25,8 @@ interface CompletionExerciseCardProps {
 }
 
 export default function CompletionExerciseCard({
+  showFeedback,
   currentExercise,
-  questionState,
-  options,
-  sentenceParts,
   currentExerciseIndex,
   totalQuestions: filteredExercisesLength,
   handleAnswerSelect,
@@ -37,7 +34,35 @@ export default function CompletionExerciseCard({
   handlePreviousExercise,
   handleNextExercise,
 }: CompletionExerciseCardProps) {
-  const selectedAnswer = currentExercise.selectedOption || null;
+
+const selectedAnswer = currentExercise.selectedOption || null;
+// Determine the question state based on the current exercise and feedback visibility
+let questionState: QuestionState;
+
+if (currentExercise.selectedOption === null) {
+  questionState = "unanswered";
+} else if (!showFeedback) {
+  questionState = "answered";
+} else if (currentExercise.answeredCorrectly === true) {
+  questionState = "correct";
+} else if (currentExercise.answeredCorrectly === false) {
+  questionState = "incorrect";
+} else {
+  questionState = "answered";
+}
+
+  //Extract the question options
+  const options = [
+    ...currentExercise.incorrectOptions,
+    currentExercise.correctOption,
+  ].sort((a,b)=> a.localeCompare(b));
+
+  // Split the question into parts
+  var [before, after] = currentExercise.question.includes("____")? currentExercise.question.split("____"): ["", ""];
+  after = after.replace(/_+/g, "").trim();
+
+
+
 
   return (
     <Card className="border-2">
@@ -45,11 +70,11 @@ export default function CompletionExerciseCard({
         <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
           {/* question */}
           <div className="text-lg mb-8">
-            {sentenceParts[0]}
+            {before}
             <span className="inline-block min-w-[80px] px-2 mx-1 border-b-2 border-primary font-bold">
               {selectedAnswer || ""}
             </span>
-            {sentenceParts[1]}
+            {after}
           </div>
 
           {/* options */}
@@ -61,12 +86,14 @@ export default function CompletionExerciseCard({
               let buttonClass = "justify-start h-auto py-3 px-4";
 
               if (selectedAnswer === option) {
-                if (questionState === "correct") {
+                if (showFeedback ) {
+                if (currentExercise.answeredCorrectly  === true) {
                   buttonClass +=
                     " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
                 } else if (questionState === "incorrect") {
                   buttonClass +=
                     " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
+                }
                 } else if (questionState === "answered") {
                   buttonClass +=
                     " bg-blue-100 text-blue-700 border-blue-500 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700";
@@ -84,12 +111,14 @@ export default function CompletionExerciseCard({
                   {selectedAnswer === option && questionState === "correct" && (
                     <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
                   )}
-                  {selectedAnswer === option && questionState === "incorrect" && (
-                    <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
-                  )}
-                  {selectedAnswer === option && questionState === "answered" && (
-                  <CheckCircle className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
-                  )}
+                  {selectedAnswer === option &&
+                    questionState === "incorrect" && (
+                      <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
+                    )}
+                  {selectedAnswer === option &&
+                    questionState === "answered" && (
+                      <Dot  className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
+                    )}
                 </Button>
               );
             })}

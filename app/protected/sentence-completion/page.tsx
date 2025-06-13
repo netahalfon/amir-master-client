@@ -214,19 +214,9 @@ export default function SentenceCompletion() {
               handleReset={handleReset}
               handlePreviousExercise={handlePreviousExercise}
               handleNextExercise={handleNextExercise}
-              questionState={
-                selectedAnswer
-                  ? isCorrect === true
-                    ? "correct"
-                    : isCorrect === false
-                    ? "incorrect"
-                    : "answered"
-                  : "unanswered"
-              }
+              showFeedback={true}
               currentExerciseIndex={currentExerciseIndex}
               totalQuestions={filteredExercises.length}
-              sentenceParts={sentenceParts}
-              options={options}
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">
