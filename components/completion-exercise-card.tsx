@@ -14,7 +14,6 @@ import { QuestionData } from "@/types/chapter-types";
 
 interface CompletionExerciseCardProps {
   currentExercise: QuestionData;
-  selectedAnswer: string | null;
   questionState: QuestionState;
   options: string[];
   sentenceParts: [string, string];
@@ -28,7 +27,6 @@ interface CompletionExerciseCardProps {
 
 export default function CompletionExerciseCard({
   currentExercise,
-  selectedAnswer,
   questionState,
   options,
   sentenceParts,
@@ -39,6 +37,8 @@ export default function CompletionExerciseCard({
   handlePreviousExercise,
   handleNextExercise,
 }: CompletionExerciseCardProps) {
+  const selectedAnswer = currentExercise.selectedOption || null;
+
   return (
     <Card className="border-2">
       <CardContent className="pt-6">

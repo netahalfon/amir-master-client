@@ -210,7 +210,6 @@ export default function SentenceCompletion() {
           {currentExercise ? (
             <CompletionExerciseCard
               currentExercise={currentExercise}
-              selectedAnswer={selectedAnswer}
               handleAnswerSelect={handleAnswerSelect}
               handleReset={handleReset}
               handlePreviousExercise={handlePreviousExercise}

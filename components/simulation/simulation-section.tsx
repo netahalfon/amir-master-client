@@ -149,7 +149,6 @@ const handleNextExercise = () => {
       {chapters[currentChapterIndex]?.type === "completion" && (
         <CompletionExerciseCard
                       currentExercise={currentExercise}
-                      selectedAnswer={selectedAnswer}
                       handleAnswerSelect={handleAnswerSelect}
                       handleReset={handleReset}
                       handlePreviousExercise={handlePreviousExercise}
