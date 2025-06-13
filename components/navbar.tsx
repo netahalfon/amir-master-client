@@ -10,6 +10,8 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import LogoutModal from "@/components/logout-modal";
 import axiosInstance, { REQUESTS } from "@/lib/axios"
+import { useRouter } from "next/navigation";
+
 
 
 const navItems = [
@@ -28,6 +30,7 @@ export default function Navbar() {
   const { theme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const router = useRouter();
 
   const handleLogoutButton = () => {
     setShowLogoutModal(true);
@@ -35,8 +38,8 @@ export default function Navbar() {
 
   const handleConfirmLogout = async () => {
     try {
-      //setAuth
       await axiosInstance.post(REQUESTS.LOGOUT);
+      router.push("/auth/login");
       setShowLogoutModal(false);
     } catch (err) {
       console.error("Logout failed:", err);
