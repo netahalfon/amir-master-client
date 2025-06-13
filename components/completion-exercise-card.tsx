@@ -155,7 +155,7 @@ if (currentExercise.selectedOption === null) {
             </Button>
           </div>
         )}
-        {currentExercise.order- 1 < filteredExercisesLength - 1 && (
+        {currentExercise.order < filteredExercisesLength && (
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
               Next Question
