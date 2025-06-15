@@ -9,6 +9,7 @@ import {
 } from "@/components/simulation/simulation-bar";
 import CompletionExerciseCard from "@/components/completion-exercise-card";
 import RephrasingExerciseCard from "../rephrasing-exercise-card";
+import ReadingExerciseCard from "../reading-exercise-card";
 
 interface SimulationSectionProps {
   sectionNum: number;
@@ -24,8 +25,9 @@ export default function SimulationSection({
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes in seconds
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentChapterIndex, setCurrentChapterIndex] = useState<number>(0);
-  const [questionStates, setQuestionStates] = useState<QuestionState[]>(Array(22).fill("unanswered"));
-
+  const [questionStates, setQuestionStates] = useState<QuestionState[]>(
+    Array(22).fill("unanswered")
+  );
 
   // Timer countdown effect
   useEffect(() => {
@@ -120,20 +122,34 @@ export default function SimulationSection({
           Finish Section
         </button>
       </div>
-      {chapters[currentChapterIndex]?.type === "completion" && currentExercise && (
-        <CompletionExerciseCard
+      {chapters[currentChapterIndex]?.type === "completion" &&
+        currentExercise && (
+          <CompletionExerciseCard
+            currentExercise={currentExercise}
+            handleAnswerSelect={handleAnswerSelect}
+            handleReset={handleReset}
+            handlePreviousExercise={handlePreviousExercise}
+            handleNextExercise={handleNextExercise}
+            showFeedback={false}
+            totalQuestions={22}
+          />
+        )}
+      {chapters[currentChapterIndex]?.type === "rephrasing" &&
+        currentExercise && (
+          <RephrasingExerciseCard
+            currentExercise={currentExercise}
+            handleAnswerSelect={handleAnswerSelect}
+            handleReset={handleReset}
+            handlePreviousExercise={handlePreviousExercise}
+            handleNextExercise={handleNextExercise}
+            showFeedback={false}
+            totalQuestions={22}
+          />
+        )}
+      {chapters[currentChapterIndex]?.type === "reading" && currentExercise && currentChapter.passage&& (
+        <ReadingExerciseCard
           currentExercise={currentExercise}
-          handleAnswerSelect={handleAnswerSelect}
-          handleReset={handleReset}
-          handlePreviousExercise={handlePreviousExercise}
-          handleNextExercise={handleNextExercise}
-          showFeedback={false}
-          totalQuestions={22}
-        />
-      )}
-      {chapters[currentChapterIndex]?.type === "rephrasing" && currentExercise && (
-        <RephrasingExerciseCard
-          currentExercise={currentExercise}
+          passage={currentChapter.passage} // הנחה שיש פרופרטי כזה ב־chapter
           handleAnswerSelect={handleAnswerSelect}
           handleReset={handleReset}
           handlePreviousExercise={handlePreviousExercise}

@@ -12,10 +12,10 @@ export interface QuestionData {
   }
   
   export interface ChapterData {
-    type: "completion" | "rephrasing" | "grammar";
+    type: "completion" | "rephrasing" | "reading" ;
     order: number;
     questions: QuestionData[];
-    passage?: string |null;
+    passage?: string | null;
   }
 
   export interface SimulationData {

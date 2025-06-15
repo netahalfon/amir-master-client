@@ -142,7 +142,7 @@ export default function RephrasingExerciseCard({
             </Button>
           </div>
         )}
-        {currentExercise.order < totalQuestions && (
+        {currentExercise.order - 1 > 0 &&(
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
               Next Question <ArrowRight className="ml-2 h-4 w-4" />
