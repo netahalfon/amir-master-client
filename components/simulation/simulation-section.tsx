@@ -8,6 +8,7 @@ import {
   QuestionState,
 } from "@/components/simulation/simulation-bar";
 import CompletionExerciseCard from "@/components/completion-exercise-card";
+import RephrasingExerciseCard from "../rephrasing-exercise-card";
 
 interface SimulationSectionProps {
   sectionNum: number;
@@ -23,16 +24,8 @@ export default function SimulationSection({
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes in seconds
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentChapterIndex, setCurrentChapterIndex] = useState<number>(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [questionStates, setQuestionStates] = useState<QuestionState[]>(Array(22).fill("unanswered"));
 
-  // Calculate total questions and answered state array
-  const totalQuestions = chapters.reduce(
-    (sum, chapter) => sum + chapter.questions.length,
-    0
-  );
-  const [questionStates, setQuestionStates] = useState<QuestionState[]>(
-    Array(totalQuestions).fill("unanswered")
-  );
 
   // Timer countdown effect
   useEffect(() => {
@@ -58,73 +51,54 @@ export default function SimulationSection({
 
   // Update current chapter index based on question index
   useEffect(() => {
-    function getChapterIndexByQuestionIndex(
-      chapters: ChapterData[],
-      questionIndex: number
-    ): number {
-      if (questionIndex < 8) return chapters.findIndex((ch) => ch.order === 1);
-      if (questionIndex < 12) return chapters.findIndex((ch) => ch.order === 2);
-      if (questionIndex < 17) return chapters.findIndex((ch) => ch.order === 3);
-      if (questionIndex < 22) return chapters.findIndex((ch) => ch.order === 4);
+    function getChapterOrderByQuestionIndex(): number {
+      if (currentQuestionIndex < 8) return 1;
+      if (currentQuestionIndex < 12) return 2;
+      if (currentQuestionIndex < 17) return 3;
+      if (currentQuestionIndex < 22) return 4;
       return -1;
     }
 
-    const index = getChapterIndexByQuestionIndex(
-      chapters,
-      currentQuestionIndex
-    );
-    setCurrentChapterIndex(index);
-  }, [currentQuestionIndex, chapters]);
+    const order = getChapterOrderByQuestionIndex();
+    setCurrentChapterIndex(order - 1);
+  }, [currentQuestionIndex]);
 
-const currentChapter = chapters[currentChapterIndex];
-const startIndex = chapters
-  .slice(0, currentChapterIndex)
-  .reduce((sum, ch) => sum + ch.questions.length, 0);
-const localIndex = currentQuestionIndex - startIndex;
-const currentExercise = currentChapter.questions[localIndex];
+  //define and fill the current chapter and exercise based on indices
+  const currentChapter = chapters[currentChapterIndex];
+  const currentExercise = currentChapter?.questions.find(
+    (q) => q.order === currentQuestionIndex + 1
+  );
 
+  const handleAnswerSelect = (option: string) => {
+    if (!currentExercise) return;
+    const isCorrect = option === currentExercise.correctOption;
+    currentExercise.selectedOption = option;
+    currentExercise.answeredCorrectly = isCorrect;
+    setQuestionStates((prev) => {
+      const updated = [...prev];
+      updated[currentQuestionIndex] = "answered";
+      return updated;
+    });
+  };
 
-const questionState: QuestionState = selectedAnswer ? "answered" : "unanswered";
+  const handleReset = () => {
+    if (!currentExercise) return;
+    currentExercise.selectedOption = null;
+    currentExercise.answeredCorrectly = null;
+    setQuestionStates((prev) => {
+      const updated = [...prev];
+      updated[currentQuestionIndex] = "unanswered";
+      return updated;
+    });
+  };
 
-const sentenceParts: [string, string] =
-  currentExercise.question.includes("____")
-    ? currentExercise.question.split("____") as [string, string]
-    : ["", ""];
+  const handlePreviousExercise = () => {
+    setCurrentQuestionIndex((prev) => prev - 1);
+  };
 
-const options = [
-  ...currentExercise.incorrectOptions,
-  currentExercise.correctOption,
-];
-
-const handleAnswerSelect = (option: string) => {
-  const isCorrect = option === currentExercise.correctOption;
-  currentExercise.selectedOption = option;
-  currentExercise.answeredCorrectly = isCorrect;
-  setQuestionStates((prev) => {
-    const updated = [...prev];
-    updated[currentQuestionIndex] = "answered";
-    return updated;
-  });
-  setSelectedAnswer(option);
-};
-
-const handleReset = () => {
-  currentExercise.selectedOption = null;
-  currentExercise.answeredCorrectly = null;
-  setQuestionStates((prev) => {
-    const updated = [...prev];
-    updated[currentQuestionIndex] = "unanswered";
-    return updated;
-  });
-};
-
-const handlePreviousExercise = () => {
-  setCurrentQuestionIndex((prev) => prev - 1);
-};
-
-const handleNextExercise = () => {
-  setCurrentQuestionIndex((prev) => prev + 1);
-};
+  const handleNextExercise = () => {
+    setCurrentQuestionIndex((prev) => prev + 1);
+  };
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row items-start justify-between gap-4 mb-6">
@@ -135,7 +109,7 @@ const handleNextExercise = () => {
         <SimulationBar
           currentQuestionOrder={currentQuestionIndex}
           questionStates={questionStates}
-          totalQuestions={totalQuestions}
+          totalQuestions={22}
           onQuestionClick={(index) => setCurrentQuestionIndex(index)}
         />
 
@@ -146,16 +120,27 @@ const handleNextExercise = () => {
           Finish Section
         </button>
       </div>
-      {chapters[currentChapterIndex]?.type === "completion" && (
+      {chapters[currentChapterIndex]?.type === "completion" && currentExercise && (
         <CompletionExerciseCard
-                      currentExercise={currentExercise}
-                      handleAnswerSelect={handleAnswerSelect}
-                      handleReset={handleReset}
-                      handlePreviousExercise={handlePreviousExercise}
-                      handleNextExercise={handleNextExercise}
-                      showFeedback={false}
-                      totalQuestions={22}
-                    />
+          currentExercise={currentExercise}
+          handleAnswerSelect={handleAnswerSelect}
+          handleReset={handleReset}
+          handlePreviousExercise={handlePreviousExercise}
+          handleNextExercise={handleNextExercise}
+          showFeedback={false}
+          totalQuestions={22}
+        />
+      )}
+      {chapters[currentChapterIndex]?.type === "rephrasing" && currentExercise && (
+        <RephrasingExerciseCard
+          currentExercise={currentExercise}
+          handleAnswerSelect={handleAnswerSelect}
+          handleReset={handleReset}
+          handlePreviousExercise={handlePreviousExercise}
+          handleNextExercise={handleNextExercise}
+          showFeedback={false}
+          totalQuestions={22}
+        />
       )}
     </div>
   );

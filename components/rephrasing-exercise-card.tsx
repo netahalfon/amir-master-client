@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   XCircle,
-  Dot,
   RotateCcw,
   ArrowLeft,
   ArrowRight,
+  Dot,
 } from "lucide-react";
 import { QuestionData, QuestionState } from "@/types/chapter-types";
 
-interface CompletionExerciseCardProps {
+interface RephrasingExerciseCardProps {
   showFeedback: boolean;
   currentExercise: QuestionData;
   totalQuestions: number;
@@ -22,18 +22,20 @@ interface CompletionExerciseCardProps {
   handleNextExercise: () => void;
 }
 
-export default function CompletionExerciseCard({
+export default function RephrasingExerciseCard({
   showFeedback,
   currentExercise,
-  totalQuestions: filteredExercisesLength,
+  totalQuestions,
   handleAnswerSelect,
   handleReset,
   handlePreviousExercise,
   handleNextExercise,
-}: CompletionExerciseCardProps) {
+}: RephrasingExerciseCardProps) {
+
   const selectedAnswer = currentExercise.selectedOption || null;
-  // Determine the question state based on the current exercise and feedback visibility
+
   let questionState: QuestionState;
+  // Determine the question state based on the current exercise and feedback visibility
   if (currentExercise.selectedOption === null) {
     questionState = "unanswered";
   } else if (!showFeedback) {
@@ -46,40 +48,29 @@ export default function CompletionExerciseCard({
     questionState = "answered";
   }
 
-  //Extract the question options
   const options = [
     ...currentExercise.incorrectOptions,
     currentExercise.correctOption,
-  ].sort((a, b) => a.localeCompare(b));
-
-  // Split the question into parts
-  var [before, after] = currentExercise.question.includes("____")
-    ? currentExercise.question.split("____")
-    : ["", ""];
-  after = after.replace(/_+/g, "").trim();
+  ].sort((a,b)=> a.localeCompare(b));
 
   return (
     <Card className="border-2">
       <CardContent className="pt-6">
         <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
           {/* question */}
-          <div className="text-lg mb-8">
-            {before}
-            <span className="inline-block min-w-[80px] px-2 mx-1 border-b-2 border-primary font-bold">
-              {selectedAnswer || ""}
-            </span>
-            {after}
-          </div>
+          <p className="text-lg font-bold mb-8 px-4 py-2 bg-muted rounded-md">
+            "{currentExercise.question}"
+          </p>
 
           {/* options */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md">
+                  <div className="grid grid-cols-1 gap-3 w-full max-w--fit mx-auto">
             {options.map((option, index) => {
               const isSelected = selectedAnswer === option;
-              const isCorrectOption = option === currentExercise?.correctOption;
+              const isCorrectOption = option === currentExercise.correctOption;
 
               let buttonClass = "justify-start h-auto py-3 px-4";
 
-              if (selectedAnswer === option) {
+              if (isSelected) {
                 if (showFeedback) {
                   if (currentExercise.answeredCorrectly === true) {
                     buttonClass +=
@@ -100,24 +91,24 @@ export default function CompletionExerciseCard({
                   variant="outline"
                   className={buttonClass}
                   onClick={() => handleAnswerSelect(option)}
+                  disabled={isSelected}
                 >
                   {option}
-                  {selectedAnswer === option && questionState === "correct" && (
+                  {isSelected && questionState === "correct" && (
                     <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
                   )}
-                  {selectedAnswer === option &&
-                    questionState === "incorrect" && (
-                      <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
-                    )}
-                  {selectedAnswer === option &&
-                    questionState === "answered" && (
-                      <Dot className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
-                    )}
+                  {isSelected && questionState === "incorrect" && (
+                    <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
+                  )}
+                  {isSelected && questionState === "answered" && (
+                    <Dot className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
+                  )}
                 </Button>
               );
             })}
           </div>
-          {/* Answer Feedback */}
+
+          {/* feedback */}
           {selectedAnswer && (
             <div className="mt-6 flex items-center gap-4">
               {questionState === "correct" && (
@@ -147,16 +138,14 @@ export default function CompletionExerciseCard({
         {currentExercise.order - 1 > 0 && (
           <div className="mr-auto">
             <Button variant="outline" onClick={handlePreviousExercise}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Previous Question
+              <ArrowLeft className="mr-2 h-4 w-4" /> Previous Question
             </Button>
           </div>
         )}
-        {currentExercise.order < filteredExercisesLength && (
+        {currentExercise.order < totalQuestions && (
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
-              Next Question
-              <ArrowRight className="ml-2 h-4 w-4" />
+              Next Question <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
         )}
