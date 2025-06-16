@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   XCircle,
-    Dot,
+  Dot,
   RotateCcw,
   ArrowLeft,
   ArrowRight,
@@ -20,7 +20,7 @@ interface ReadingExerciseCardProps {
   handleReset: () => void;
   handlePreviousExercise: () => void;
   handleNextExercise: () => void;
-passage: string;
+  passage: string;
 }
 
 export default function ReadingExerciseCard({
@@ -32,58 +32,63 @@ export default function ReadingExerciseCard({
   handlePreviousExercise,
   handleNextExercise,
   passage,
-  
 }: ReadingExerciseCardProps) {
-    const selectedAnswer = currentExercise.selectedOption || null;
-    
-      let questionState: QuestionState;
-      // Determine the question state based on the current exercise and feedback visibility
-      if (currentExercise.selectedOption === null) {
-        questionState = "unanswered";
-      } else if (!showFeedback) {
-        questionState = "answered";
-      } else if (currentExercise.answeredCorrectly === true) {
-        questionState = "correct";
-      } else if (currentExercise.answeredCorrectly === false) {
-        questionState = "incorrect";
-      } else {
-        questionState = "answered";
-      }
-    
-      const options = [
-        ...currentExercise.incorrectOptions,
-        currentExercise.correctOption,
-      ].sort((a,b)=> a.localeCompare(b));
-    
+  const selectedAnswer = currentExercise.selectedOption || null;
+
+  let questionState: QuestionState;
+  // Determine the question state based on the current exercise and feedback visibility
+  if (currentExercise.selectedOption === null) {
+    questionState = "unanswered";
+  } else if (!showFeedback) {
+    questionState = "answered";
+  } else if (currentExercise.answeredCorrectly === true) {
+    questionState = "correct";
+  } else if (currentExercise.answeredCorrectly === false) {
+    questionState = "incorrect";
+  } else {
+    questionState = "answered";
+  }
+
+  const options = [
+    ...currentExercise.incorrectOptions,
+    currentExercise.correctOption,
+  ].sort((a, b) => a.localeCompare(b));
+
   return (
     <div className="flex gap-4 items-start">
-      {/* כרטיס 1 – passage עם סקרול */}
-      <Card className="w-1/2 border-2 py-3 max-h-[500px] overflow-y-auto">
+
+      {/* card 1 – passage with scroll */}
+      <Card className="w-1/2 border-2 py-3 h-[500px] overflow-y-auto">
         <CardContent>
           <p className="whitespace-pre-line">{passage}</p>
         </CardContent>
       </Card>
 
-      {/* כרטיס 2 – תרגיל עם תשובות */}
+      {/* card 2 – exercise with answers */}
       <Card className="w-1/2 border-2 h-[500px]">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
+            {/* question */}
             <p className="text-lg font-bold mb-8 px-4 py-2 bg-muted rounded-md">
               "{currentExercise.question}"
             </p>
+            {/* options */}
             <div className="grid grid-cols-1 gap-3 w-full max-w--fit mx-auto">
               {options.map((option, index) => {
                 const isSelected = selectedAnswer === option;
-                const isCorrectOption =
-                  option === currentExercise.correctOption;
-                let buttonClass = "justify-start h-auto py-3 px-4";
+                let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
                 if (isSelected) {
-                  if (isCorrectOption) {
+                  if (showFeedback) {
+                    if (currentExercise.answeredCorrectly === true) {
+                      buttonClass +=
+                        " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
+                    } else if (questionState === "incorrect") {
+                      buttonClass +=
+                        " bg-red-100 border-red-500 dark:bg-red-900 dark:text-400 dark:border-red-700";
+                    }
+                  } else if (questionState === "answered") {
                     buttonClass +=
-                      " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
-                  } else {
-                    buttonClass +=
-                      " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
+                      " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                   }
                 }
                 return (
@@ -96,14 +101,11 @@ export default function ReadingExerciseCard({
                   >
                     {option}
                     {isSelected && questionState === "correct" && (
-                      <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
+                      <CheckCircle className="ml-auto" />
                     )}
                     {isSelected && questionState === "incorrect" && (
-                      <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
+                      <XCircle className="ml-auto" />
                     )}
-                    {isSelected && questionState === "answered" && (
-                    <Dot className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
-                  )}
                   </Button>
                 );
               })}

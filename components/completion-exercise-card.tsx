@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle,
   XCircle,
-  Dot,
   RotateCcw,
   ArrowLeft,
   ArrowRight,
@@ -75,22 +74,20 @@ export default function CompletionExerciseCard({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md">
             {options.map((option, index) => {
               const isSelected = selectedAnswer === option;
-              const isCorrectOption = option === currentExercise?.correctOption;
+              let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
 
-              let buttonClass = "justify-start h-auto py-3 px-4";
-
-              if (selectedAnswer === option) {
+              if (isSelected) {
                 if (showFeedback) {
                   if (currentExercise.answeredCorrectly === true) {
                     buttonClass +=
-                      " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
+                      " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
                   } else if (questionState === "incorrect") {
                     buttonClass +=
-                      " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
+                      " bg-red-100 border-red-500 dark:bg-red-900 dark:text-400 dark:border-red-700";
                   }
                 } else if (questionState === "answered") {
                   buttonClass +=
-                    " bg-blue-100 text-blue-700 border-blue-500 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700";
+                    " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                 }
               }
 
@@ -100,24 +97,20 @@ export default function CompletionExerciseCard({
                   variant="outline"
                   className={buttonClass}
                   onClick={() => handleAnswerSelect(option)}
+                  disabled={isSelected}
                 >
                   {option}
-                  {selectedAnswer === option && questionState === "correct" && (
-                    <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
+                  {isSelected && questionState === "correct" && (
+                    <CheckCircle className="ml-auto" />
                   )}
-                  {selectedAnswer === option &&
-                    questionState === "incorrect" && (
-                      <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
-                    )}
-                  {selectedAnswer === option &&
-                    questionState === "answered" && (
-                      <Dot className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
-                    )}
+                  {isSelected && questionState === "incorrect" && (
+                    <XCircle className="ml-auto" />
+                  )}
                 </Button>
               );
             })}
           </div>
-          {/* Answer Feedback */}
+          {/* Answer Feedback  */}
           {selectedAnswer && (
             <div className="mt-6 flex items-center gap-4">
               {questionState === "correct" && (

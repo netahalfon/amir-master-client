@@ -63,47 +63,40 @@ export default function RephrasingExerciseCard({
           </p>
 
           {/* options */}
-                  <div className="grid grid-cols-1 gap-3 w-full max-w--fit mx-auto">
-            {options.map((option, index) => {
-              const isSelected = selectedAnswer === option;
-              const isCorrectOption = option === currentExercise.correctOption;
-
-              let buttonClass = "justify-start h-auto py-3 px-4";
-
-              if (isSelected) {
-                if (showFeedback) {
-                  if (currentExercise.answeredCorrectly === true) {
+            <div className="grid grid-cols-1 gap-3 w-full max-w--fit mx-auto">
+              {options.map((option, index) => {
+                const isSelected = selectedAnswer === option;
+                let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
+                if (isSelected) {
+                  if (showFeedback) {
+                    if (currentExercise.answeredCorrectly === true) {
+                      buttonClass +=
+                        " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
+                    } else if (questionState === "incorrect") {
+                      buttonClass +=
+                        " bg-red-100 border-red-500 dark:bg-red-900 dark:text-400 dark:border-red-700";
+                    }
+                  } else if (questionState === "answered") {
                     buttonClass +=
-                      " bg-green-100 text-green-700 border-green-500 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700";
-                  } else if (questionState === "incorrect") {
-                    buttonClass +=
-                      " bg-red-100 text-red-700 border-red-500 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700";
+                      " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                   }
-                } else if (questionState === "answered") {
-                  buttonClass +=
-                    " bg-blue-100 text-blue-700 border-blue-500 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700";
                 }
-              }
-
-              return (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={buttonClass}
-                  onClick={() => handleAnswerSelect(option)}
-                  disabled={isSelected}
-                >
-                  {option}
-                  {isSelected && questionState === "correct" && (
-                    <CheckCircle className="ml-auto h-5 w-5 text-green-500 shrink-0" />
-                  )}
-                  {isSelected && questionState === "incorrect" && (
-                    <XCircle className="ml-auto h-5 w-5 text-red-500 shrink-0" />
-                  )}
-                  {isSelected && questionState === "answered" && (
-                    <Dot className="ml-auto h-5 w-5 text-blue-700 dark:text-blue-300 shrink-0" />
-                  )}
-                </Button>
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className={buttonClass}
+                    onClick={() => handleAnswerSelect(option)}
+                    disabled={isSelected}
+                  >
+                    {option}
+                    {isSelected && questionState === "correct" && (
+                      <CheckCircle className="ml-auto" />
+                    )}
+                    {isSelected && questionState === "incorrect" && (
+                      <XCircle className="ml-auto" />
+                    )}
+                  </Button>
               );
             })}
           </div>
