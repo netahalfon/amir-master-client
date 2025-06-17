@@ -24,31 +24,34 @@ import SimulationReview from "@/components/simulation/simulation-review";
 import { useApi } from "@/services/use-api";
 import type {
   SimulationData,
+  SimulationGradeResult,
   ChapterData,
   QuestionData,
 } from "@/types/chapter-types";
 import { set } from "date-fns";
 
-export function convertEnglishRawScoreToScaled(rawScore: number): number {
-  const scoreMap = [
-    50, 52, 54, 57, 59, 61, 63, 65, 68, 70, 72, 74, 76, 79, 81, 83, 85, 87, 90,
-    92, 94, 96, 99, 101, 104, 106, 108, 110, 113, 115, 117, 119, 121, 123, 126,
-    128, 130, 133, 135, 138, 140, 142, 145, 147, 150,
-  ];
-  if (rawScore < 0 || rawScore > 44) {
-    throw new Error("Raw score must be between 0 and 44.");
-  }
-  return scoreMap[rawScore];
-}
-
 export default function Simulations() {
-  const { getSimulationOptions, getSimulation, upsertAnsweredQuestion } = useApi();
+  const {
+    getSimulationOptions,
+    getSimulation,
+    upsertAnsweredQuestion,
+    getSimulationGrade,
+  } = useApi();
   const [simulationOptions, setSimulationOptions] = useState<any[]>([]);
-  const [selectedSimulationId, setSelectedSimulationId] = useState<string | undefined>(undefined);
-  const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
+  const [selectedSimulationId, setSelectedSimulationId] = useState<
+    string | undefined
+  >(undefined);
+  const [simulationData, setSimulationData] = useState<SimulationData | null>(
+    null
+  );
   const [simulationStage, setSimulationStage] = useState<
     null | "section1" | "section2" | "get grade" | "review"
   >(null);
+
+
+  const [gradeResult, setGradeResult] = useState<SimulationGradeResult | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchSimulationOptions = async () => {
@@ -72,132 +75,157 @@ export default function Simulations() {
   };
 
   const returnToMenu = () => {
-  setSimulationStage(null);
-  setSimulationData(null);
-  setSelectedSimulationId(undefined); 
-};
+    setSimulationStage(null);
+    setSimulationData(null);
+    setSelectedSimulationId(undefined);
+  };
 
   //update the simulation answers in the state and in the server
   const updateQuestionAnswer = async (
-  sectionNum: 1 | 2,
-  chapterIdx: number,
-  questionIdx: number,
-  selectedOption: string | null
-) => {
-  if (!simulationData) return;
+    sectionNum: 1 | 2,
+    chapterIdx: number,
+    questionIdx: number,
+    selectedOption: string | null
+  ) => {
+    if (!simulationData) return;
 
-  const sectionKey = sectionNum === 1 ? "chaptersSection1" : "chaptersSection2";
+    const sectionKey =
+      sectionNum === 1 ? "chaptersSection1" : "chaptersSection2";
 
-  const question = simulationData[sectionKey][chapterIdx]?.questions[questionIdx];
+    const question =
+      simulationData[sectionKey][chapterIdx]?.questions[questionIdx];
 
-  const isCorrect = selectedOption ? question.correctOption === selectedOption : null;
+    const isCorrect = selectedOption
+      ? question.correctOption === selectedOption
+      : null;
 
-  try {
-    // Save the answer to the server
-    await upsertAnsweredQuestion(question._id, isCorrect, selectedOption);
-    // Update the local state
-    setSimulationData((prev) => {
-      if (!prev) return prev;
+    try {
+      // Save the answer to the server
+      await upsertAnsweredQuestion(question._id, isCorrect, selectedOption);
+      // Update the local state
+      setSimulationData((prev) => {
+        if (!prev) return prev;
 
-      const updatedChapters = prev[sectionKey].map((chapter, cIdx) => {
-        if (cIdx !== chapterIdx) return chapter;
+        const updatedChapters = prev[sectionKey].map((chapter, cIdx) => {
+          if (cIdx !== chapterIdx) return chapter;
 
-        const updatedQuestions = chapter.questions.map((q, qIdx) => {
-          if (qIdx !== questionIdx) return q;
+          const updatedQuestions = chapter.questions.map((q, qIdx) => {
+            if (qIdx !== questionIdx) return q;
+
+            return {
+              ...q,
+              selectedOption,
+              answeredCorrectly: isCorrect,
+            };
+          });
 
           return {
-            ...q,
-            selectedOption,
-            answeredCorrectly: isCorrect,
+            ...chapter,
+            questions: updatedQuestions,
           };
         });
 
         return {
-          ...chapter,
-          questions: updatedQuestions,
+          ...prev,
+          [sectionKey]: updatedChapters,
         };
       });
+    } catch (err) {
+      console.error("❌ Failed to save answer to server:", err);
+    }
+  };
 
-      return {
-        ...prev,
-        [sectionKey]: updatedChapters,
+  const getGrade = async (): Promise<SimulationGradeResult | undefined> => {
+    if (!selectedSimulationId) return;
+
+    try {
+      const gradeData = await getSimulationGrade(selectedSimulationId);
+      const result: SimulationGradeResult = {
+        grade: gradeData.grade,
+        correctAnswers: gradeData.correctAnswers,
+        totalQuestions: gradeData.totalQuestions,
       };
-    });
-  } catch (err) {
-    console.error("❌ Failed to save answer to server:", err);
-  }
-};
+      setGradeResult(result);
+      return result;
+    } catch (err) {
+      console.error("❌ Failed to fetch simulation grade:", err);
+    }
+  };
 
-
+  useEffect(() => {
+    if (simulationStage === "get grade") {
+      getGrade();
+    }
+  }, [simulationStage]);
 
   return (
-  <div className="container py-8">
-    {simulationStage == null ? (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Simulations</CardTitle>
-          <CardDescription>
-            Take full test simulations with mixed question types.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            {/* Select Simulation */}
-            <Select
-              value={selectedSimulationId}
-              onValueChange={setSelectedSimulationId}
-            >
-              <SelectTrigger className="w-full md:w-[300px] mb-8">
-                <SelectValue placeholder="Select a simulation" />
-              </SelectTrigger>
-              <SelectContent>
-                {simulationOptions.map((sim) => (
-                  <SelectItem key={sim._id} value={sim._id}>
-                    {sim.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <h3 className="text-xl font-medium mb-4">
-              Ready to start a simulation?
-            </h3>
-            <p className="text-muted-foreground mb-8 max-w-md">
-              This simulation will include 10 mixed questions (sentence
-              completion, rephrasing, reading) with a 20-minute timer.
-            </p>
-            <Button
-              onClick={startSimulation}
-              size="lg"
-              disabled={!selectedSimulationId}
-            >
-              Start Simulation
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    ) : simulationStage == "section1" && simulationData ? (
-      <SimulationSection
-        sectionNum={1}
-        chapters={simulationData?.chaptersSection1}
-        updateQuestionAnswer={updateQuestionAnswer}
-        onSectionComplete={() => setSimulationStage("section2")}
-      />
-    ) : simulationStage == "section2" && simulationData ? (
-      <SimulationSection
-        sectionNum={2}
-        chapters={simulationData?.chaptersSection2}
-        updateQuestionAnswer={updateQuestionAnswer}
-        onSectionComplete={() => setSimulationStage("get grade")}
-      />
-    ) : simulationStage == "get grade" ? (
-      <SimulationGetGrade
-        onReviewClick={() => setSimulationStage("review")}
-        onBackToMenu={() => returnToMenu()}
-      />
-    ) : simulationStage == "review" ? (
-      <SimulationReview onBackToMenu={() => returnToMenu()} />
-    ) : null}
-  </div>
-);
-
+    <div className="container py-8">
+      {simulationStage == null ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Simulations</CardTitle>
+            <CardDescription>
+              Take full test simulations with mixed question types.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              {/* Select Simulation */}
+              <Select
+                value={selectedSimulationId}
+                onValueChange={setSelectedSimulationId}
+              >
+                <SelectTrigger className="w-full md:w-[300px] mb-8">
+                  <SelectValue placeholder="Select a simulation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {simulationOptions.map((sim) => (
+                    <SelectItem key={sim._id} value={sim._id}>
+                      {sim.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <h3 className="text-xl font-medium mb-4">
+                Ready to start a simulation?
+              </h3>
+              <p className="text-muted-foreground mb-8 max-w-md">
+                This simulation will include 10 mixed questions (sentence
+                completion, rephrasing, reading) with a 20-minute timer.
+              </p>
+              <Button
+                onClick={startSimulation}
+                size="lg"
+                disabled={!selectedSimulationId}
+              >
+                Start Simulation
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : simulationStage == "section1" && simulationData ? (
+        <SimulationSection
+          sectionNum={1}
+          chapters={simulationData?.chaptersSection1}
+          updateQuestionAnswer={updateQuestionAnswer}
+          onSectionComplete={() => setSimulationStage("section2")}
+        />
+      ) : simulationStage == "section2" && simulationData ? (
+        <SimulationSection
+          sectionNum={2}
+          chapters={simulationData?.chaptersSection2}
+          updateQuestionAnswer={updateQuestionAnswer}
+          onSectionComplete={() => setSimulationStage("get grade")}
+        />
+      ) : simulationStage == "get grade" ? (
+        <SimulationGetGrade
+          gradeResult={gradeResult}
+          onReviewClick={() => setSimulationStage("review")}
+          onBackToMenu={() => returnToMenu()}
+        />
+      ) : simulationStage == "review" ? (
+        <SimulationReview onBackToMenu={() => returnToMenu()} />
+      ) : null}
+    </div>
+  );
 }

@@ -24,6 +24,8 @@ export const REQUESTS = {
   //simulation
   GET_SIMULATIONS_OPTIONS: "/simulation/",
   GET_SIMULATION_BY_ID: "/simulation/",
+  GET_SIMULATION_GRADE_BY_ID: "/simulation/get-grade/",
+
 };
 
 const BASE_URL = "http://localhost:3001/api";

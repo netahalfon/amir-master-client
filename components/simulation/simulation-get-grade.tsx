@@ -1,23 +1,45 @@
 "use client";
-
+import type { SimulationGradeResult } from "@/types/chapter-types";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 interface SimulationGetGradeProps {
   onReviewClick: () => void;
   onBackToMenu: () => void;
+  gradeResult: SimulationGradeResult | null;
 }
 
-export default function SimulationGetGrade({ onReviewClick }: SimulationGetGradeProps) {
+export default function SimulationGetGrade({
+  onReviewClick,
+  onBackToMenu,
+  gradeResult,
+}: SimulationGetGradeProps) {
+  const progress = gradeResult?.grade ? (gradeResult?.grade / 150) * 100 : 0;
   return (
-    <div className="text-center py-12">
-      <h3 className="text-2xl font-bold mb-4">Simulation Complete</h3>
-      <p className="text-muted-foreground max-w-md mx-auto mb-6">
-        You have completed the simulation. You can now review your answers.
-      </p>
-      <button
-        onClick={onReviewClick}
-        className="bg-primary text-white px-4 py-2 rounded"
-      >
-        Review Answers
-      </button>
+    <div className="flex flex-col items-center justify-center py-8 text-center">
+      <h3 className="text-2xl font-bold mb-4">Simulation Complete!</h3>
+
+      <div className="w-full max-w-md mb-8">
+        <div className="flex justify-between mb-2">
+          <span>Score: {gradeResult?.grade}</span>
+          <span>
+            {gradeResult?.correctAnswers} / {gradeResult?.totalQuestions} correct
+          </span>
+        </div>
+        <Progress value={progress} className="h-3" />
+      </div>
+
+      <div className="grid gap-4 w-full max-w-md mb-8">
+        <div className="flex justify-between p-3 bg-muted rounded-md">
+          <span className="font-medium">Questions answered:</span>
+          <span>
+            {gradeResult?.totalQuestions} / {44}
+          </span>
+        </div>
+      </div>
+
+      <Button onClick={onBackToMenu} size="lg">
+        Start New Simulation
+      </Button>
     </div>
   );
 }

@@ -53,19 +53,10 @@ export const useApi = () => {
 
 
   //simulation:
-// TO DO: GET SIMULATION OPTIONS AND BY ID
 
   const getSimulationGrades = async () => {
     const data = await getUserProgress();
     return data.simulationGrades;
-  };
-
-  const upsertSimulationGrade = async (simulationId: string, grade: number) => {
-    const { data } = await axiosInstance.post(REQUESTS.UPSERT_SIMULATION_GRADE, {
-      simulationId,
-      grade,
-    });
-    return data;
   };
   
   const getSimulationOptions = async () => {
@@ -78,6 +69,10 @@ export const useApi = () => {
     return data;
   };
 
+const getSimulationGrade = async (simulationId: string) => {
+  const { data } = await axiosInstance.get(`${REQUESTS.GET_SIMULATION_GRADE_BY_ID}${simulationId}`);
+  return data; // { grade, correctAnswers, totalQuestions }
+};
 
 
   //ADMIN: NOT YET IMPLEMENTED
@@ -100,7 +95,7 @@ export const useApi = () => {
     )
     return data  // הפרק החדש
   }
-  return { getUserProgress, getWordBank, getWordMasteries, upsertMastery, getChaptersByType, getAnsweredQuestions, upsertAnsweredQuestion, getSimulationGrades, upsertSimulationGrade, getSimulationOptions, getSimulation, createChapter }
+  return { getUserProgress, getWordBank, getWordMasteries, upsertMastery, getChaptersByType, getAnsweredQuestions, upsertAnsweredQuestion, getSimulationGrades, getSimulationOptions, getSimulation,getSimulationGrade, createChapter }
 }
 
 

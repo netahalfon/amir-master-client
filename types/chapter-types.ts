@@ -1,4 +1,11 @@
 // src/types/chapter-types.ts
+export interface SimulationGradeResult {
+  grade: number;
+  correctAnswers: number;
+  totalQuestions: number;
+}
+
+
 export type QuestionState = "unanswered" | "correct" | "incorrect" | "answered";
 
 export interface QuestionData {
