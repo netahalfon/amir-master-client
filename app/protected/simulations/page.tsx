@@ -42,7 +42,7 @@ export function convertEnglishRawScoreToScaled(rawScore: number): number {
 }
 
 export default function Simulations() {
-  const { getSimulationOptions, getSimulation } = useApi();
+  const { getSimulationOptions, getSimulation, upsertAnsweredQuestion } = useApi();
   const [simulationOptions, setSimulationOptions] = useState<any[]>([]);
   const [selectedSimulationId, setSelectedSimulationId] = useState<string | undefined>(undefined);
   const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
@@ -76,6 +76,59 @@ export default function Simulations() {
   setSimulationData(null);
   setSelectedSimulationId(undefined); 
 };
+
+  //update the simulation answers in the state and in the server
+  const updateQuestionAnswer = async (
+  sectionNum: 1 | 2,
+  chapterIdx: number,
+  questionIdx: number,
+  selectedOption: string | null
+) => {
+  if (!simulationData) return;
+
+  const sectionKey = sectionNum === 1 ? "chaptersSection1" : "chaptersSection2";
+
+  const question = simulationData[sectionKey][chapterIdx]?.questions[questionIdx];
+
+  const isCorrect = selectedOption ? question.correctOption === selectedOption : null;
+
+  try {
+    // Save the answer to the server
+    await upsertAnsweredQuestion(question._id, isCorrect, selectedOption);
+    // Update the local state
+    setSimulationData((prev) => {
+      if (!prev) return prev;
+
+      const updatedChapters = prev[sectionKey].map((chapter, cIdx) => {
+        if (cIdx !== chapterIdx) return chapter;
+
+        const updatedQuestions = chapter.questions.map((q, qIdx) => {
+          if (qIdx !== questionIdx) return q;
+
+          return {
+            ...q,
+            selectedOption,
+            answeredCorrectly: isCorrect,
+          };
+        });
+
+        return {
+          ...chapter,
+          questions: updatedQuestions,
+        };
+      });
+
+      return {
+        ...prev,
+        [sectionKey]: updatedChapters,
+      };
+    });
+  } catch (err) {
+    console.error("❌ Failed to save answer to server:", err);
+  }
+};
+
+
 
   return (
   <div className="container py-8">
@@ -126,12 +179,14 @@ export default function Simulations() {
       <SimulationSection
         sectionNum={1}
         chapters={simulationData?.chaptersSection1}
+        updateQuestionAnswer={updateQuestionAnswer}
         onSectionComplete={() => setSimulationStage("section2")}
       />
     ) : simulationStage == "section2" && simulationData ? (
       <SimulationSection
         sectionNum={2}
         chapters={simulationData?.chaptersSection2}
+        updateQuestionAnswer={updateQuestionAnswer}
         onSectionComplete={() => setSimulationStage("get grade")}
       />
     ) : simulationStage == "get grade" ? (

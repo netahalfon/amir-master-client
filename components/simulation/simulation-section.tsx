@@ -15,12 +15,19 @@ interface SimulationSectionProps {
   sectionNum: number;
   chapters: ChapterData[];
   onSectionComplete: () => void;
+  updateQuestionAnswer: ( // Function to update a specific question's answer
+    sectionNum: 1 | 2,
+    chapterIdx: number,
+    questionIdx: number,
+    selectedOption: string | null
+  ) => void;
 }
 
 export default function SimulationSection({
   sectionNum,
   chapters,
   onSectionComplete,
+  updateQuestionAnswer,
 }: SimulationSectionProps) {
   const [timeLeft, setTimeLeft] = useState(20 * 60); // 20 minutes in seconds
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -71,27 +78,34 @@ export default function SimulationSection({
     (q) => q.order === currentQuestionIndex + 1
   );
 
-  const handleAnswerSelect = (option: string) => {
+  const handleAnswerSelect = async (option: string | null) => {
     if (!currentExercise) return;
-    const isCorrect = option === currentExercise.correctOption;
-    currentExercise.selectedOption = option;
-    currentExercise.answeredCorrectly = isCorrect;
+
+    const questionIdxInChapter = getQuestionIndexInChapter(currentQuestionIndex);
+    if (questionIdxInChapter === -1) return;
+
+    try {
+    // שולחת את האינדקסים האמיתיים לעדכון בשרת ובסטייט
+    await updateQuestionAnswer(
+      sectionNum as 1 | 2,
+      currentChapterIndex,
+      questionIdxInChapter,
+      option
+    );
+
+// Update the local state with the selected answer
     setQuestionStates((prev) => {
       const updated = [...prev];
-      updated[currentQuestionIndex] = "answered";
+      updated[currentQuestionIndex] = option ? "answered" : "unanswered";
       return updated;
     });
+  } catch (err) {
+    console.error("❌ Failed to save answer:", err);
+  }
   };
 
   const handleReset = () => {
-    if (!currentExercise) return;
-    currentExercise.selectedOption = null;
-    currentExercise.answeredCorrectly = null;
-    setQuestionStates((prev) => {
-      const updated = [...prev];
-      updated[currentQuestionIndex] = "unanswered";
-      return updated;
-    });
+    handleAnswerSelect(null);
   };
 
   const handlePreviousExercise = () => {
@@ -101,6 +115,15 @@ export default function SimulationSection({
   const handleNextExercise = () => {
     setCurrentQuestionIndex((prev) => prev + 1);
   };
+
+  function getQuestionIndexInChapter(questionIndex: number): number {
+    //להעזר בפונקציה בעוד מקומות שמנסים למצוא את השאלה לפי אורדר 
+  if (questionIndex < 8) return questionIndex;       
+  if (questionIndex < 12) return questionIndex - 8;  
+  if (questionIndex < 17) return questionIndex - 12; 
+  if (questionIndex < 22) return questionIndex - 17; 
+  return -1; 
+}
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row items-start justify-between gap-4 mb-6">
