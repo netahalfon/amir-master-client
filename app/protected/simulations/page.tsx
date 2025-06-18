@@ -224,7 +224,11 @@ export default function Simulations() {
           onBackToMenu={() => returnToMenu()}
         />
       ) : simulationStage == "review" ? (
-        <SimulationReview onBackToMenu={() => returnToMenu()} />
+        <SimulationReview 
+          simulationData={simulationData}
+          gradeResult={gradeResult}
+          onBackToMenu={() => returnToMenu()}
+        />
       ) : null}
     </div>
   );

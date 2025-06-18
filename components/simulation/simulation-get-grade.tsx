@@ -22,7 +22,8 @@ export default function SimulationGetGrade({
         <div className="flex justify-between mb-2">
           <span>Score: {gradeResult?.grade}</span>
           <span>
-            {gradeResult?.correctAnswers} / {gradeResult?.totalQuestions} correct
+            {gradeResult?.correctAnswers} / {gradeResult?.totalQuestions}{" "}
+            correct
           </span>
         </div>
         <Progress value={progress} className="h-3" />
@@ -37,9 +38,15 @@ export default function SimulationGetGrade({
         </div>
       </div>
 
-      <Button onClick={onBackToMenu} size="lg">
-        Start New Simulation
-      </Button>
+      <div className="flex gap-4">
+        <Button onClick={onBackToMenu} size="lg">
+          Start New Simulation
+        </Button>
+
+        <Button onClick={onReviewClick} size="lg">
+          View Simulation
+        </Button>
+      </div>
     </div>
   );
 }

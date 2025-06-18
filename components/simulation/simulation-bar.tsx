@@ -8,8 +8,8 @@ import type { ChapterData } from "@/types/chapter-types";
 
 export interface SimulationBarProps {
   showFeedback: boolean;
-  chapters: ChapterData[];
-  currentQuestionIndex: number;
+  chapters: ChapterData[] |undefined;
+  currentQuestionIndex: number |null;
   totalQuestions: number;
   onQuestionClick?: (index: number) => void;
 }
@@ -22,10 +22,10 @@ export function SimulationBar({
 }: SimulationBarProps) {
 
 
-const allQuestions = chapters.flatMap((ch) => ch.questions);
+const allQuestions = chapters?.flatMap((ch) => ch.questions);
 
 // יצירת מערך המציין את מצב כל שאלה
-  const normalizedQuestionStates = allQuestions.map((q) => {
+  const normalizedQuestionStates = allQuestions?.map((q) => {
     if (showFeedback&& q.answeredCorrectly === true) return "correct";
     else if (showFeedback&& q.answeredCorrectly === false) return "incorrect";
     else if (q.selectedOption === null || q.selectedOption === undefined) return "unanswered";
@@ -36,7 +36,7 @@ const allQuestions = chapters.flatMap((ch) => ch.questions);
     
     <div className={"h-8 w-fit"}>
       <div className="flex items-center justify-start min-w-max p-1 border border-input rounded-lg">
-        {normalizedQuestionStates.map((state, index) => {
+        {normalizedQuestionStates?.map((state, index) => {
           const isCurrent = index === currentQuestionIndex;
 
           let baseColor = "bg-transparent"; // unanswered
