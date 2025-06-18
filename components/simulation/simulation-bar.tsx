@@ -3,35 +3,41 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Circle } from "lucide-react";
+import type { ChapterData } from "@/types/chapter-types";
 
-export type QuestionState = "unanswered" | "correct" | "incorrect" | "answered";
 
 export interface SimulationBarProps {
-  currentQuestionOrder: number;
-  questionStates: QuestionState[];
+  showFeedback: boolean;
+  chapters: ChapterData[];
+  currentQuestionIndex: number;
   totalQuestions: number;
   onQuestionClick?: (index: number) => void;
-  className?: string;
 }
 
 export function SimulationBar({
-  currentQuestionOrder,
-  questionStates,
-  totalQuestions,
+  currentQuestionIndex,
+  chapters,
   onQuestionClick,
-  className,
+  showFeedback
 }: SimulationBarProps) {
-  // Ensure we have the correct number of question states
-  const normalizedQuestionStates: QuestionState[] = Array.from(
-    { length: totalQuestions },
-    (_, i) => questionStates[i] || "unanswered"
-  );
+
+
+const allQuestions = chapters.flatMap((ch) => ch.questions);
+
+// יצירת מערך המציין את מצב כל שאלה
+  const normalizedQuestionStates = allQuestions.map((q) => {
+    if (showFeedback&& q.answeredCorrectly === true) return "correct";
+    else if (showFeedback&& q.answeredCorrectly === false) return "incorrect";
+    else if (q.selectedOption === null || q.selectedOption === undefined) return "unanswered";
+    return "answered";
+  });
 
   return (
-    <div className={cn("h-8 w-fit", className)}>
+    
+    <div className={"h-8 w-fit"}>
       <div className="flex items-center justify-start min-w-max p-1 border border-input rounded-lg">
         {normalizedQuestionStates.map((state, index) => {
-          const isCurrent = index === currentQuestionOrder;
+          const isCurrent = index === currentQuestionIndex;
 
           let baseColor = "bg-transparent"; // unanswered
             if (state === "correct") baseColor = "bg-green-500/20";
