@@ -12,7 +12,7 @@ import {
 import { QuestionData, QuestionState } from "@/types/chapter-types";
 
 interface CompletionExerciseCardProps {
-  showFeedback: boolean;
+  showFeedback: boolean | null;
   currentExercise: QuestionData;
   totalQuestions: number;
   handleAnswerSelect: (option: string) => void;
@@ -24,7 +24,7 @@ interface CompletionExerciseCardProps {
 export default function CompletionExerciseCard({
   showFeedback,
   currentExercise,
-  totalQuestions: filteredExercisesLength,
+  totalQuestions,
   handleAnswerSelect,
   handleReset,
   handlePreviousExercise,
@@ -35,7 +35,7 @@ export default function CompletionExerciseCard({
   let questionState: QuestionState;
   if (currentExercise.selectedOption === null) {
     questionState = "unanswered";
-  } else if (!showFeedback) {
+  } else if (showFeedback === false) {
     questionState = "answered";
   } else if (currentExercise.answeredCorrectly === true) {
     questionState = "correct";
@@ -77,7 +77,7 @@ export default function CompletionExerciseCard({
               let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
 
               if (isSelected) {
-                if (showFeedback) {
+                  if (showFeedback || showFeedback === null) {
                   if (currentExercise.answeredCorrectly === true) {
                     buttonClass +=
                       " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
@@ -90,6 +90,10 @@ export default function CompletionExerciseCard({
                     " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                 }
               }
+              if (showFeedback && option == currentExercise.correctOption) {
+                buttonClass +=
+                  " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
+              }
 
               return (
                 <Button
@@ -97,7 +101,7 @@ export default function CompletionExerciseCard({
                   variant="outline"
                   className={buttonClass}
                   onClick={() => handleAnswerSelect(option)}
-                  disabled={isSelected}
+                    disabled={isSelected || showFeedback === true}
                 >
                   {option}
                   {isSelected && questionState === "correct" && (
@@ -111,7 +115,7 @@ export default function CompletionExerciseCard({
             })}
           </div>
           {/* Answer Feedback  */}
-          {selectedAnswer && (
+          {selectedAnswer && !showFeedback&& (
             <div className="mt-6 flex items-center gap-4">
               {questionState === "correct" && (
                 <p className="text-green-500 dark:text-green-400 font-medium">
@@ -145,7 +149,7 @@ export default function CompletionExerciseCard({
             </Button>
           </div>
         )}
-        {currentExercise.order < filteredExercisesLength && (
+          {currentExercise.order !== totalQuestions && (
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
               Next Question

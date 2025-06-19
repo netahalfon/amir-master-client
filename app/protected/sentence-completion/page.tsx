@@ -214,7 +214,7 @@ export default function SentenceCompletion() {
               handleReset={handleReset}
               handlePreviousExercise={handlePreviousExercise}
               handleNextExercise={handleNextExercise}
-              showFeedback={true}
+              showFeedback={null}
               totalQuestions={filteredExercises.length}
             />
           ) : (

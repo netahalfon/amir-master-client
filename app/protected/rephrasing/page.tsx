@@ -206,7 +206,7 @@ export default function Rephrasing() {
               handleReset={handleReset}
               handlePreviousExercise={handlePreviousExercise}
               handleNextExercise={handleNextExercise}
-              showFeedback={true}
+              showFeedback={null}
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-12 text-center">

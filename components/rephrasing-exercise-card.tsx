@@ -13,7 +13,7 @@ import {
 import { QuestionData, QuestionState } from "@/types/chapter-types";
 
 interface RephrasingExerciseCardProps {
-  showFeedback: boolean;
+  showFeedback: boolean|null;
   currentExercise: QuestionData;
   totalQuestions: number;
   handleAnswerSelect: (option: string) => void;
@@ -38,7 +38,7 @@ export default function RephrasingExerciseCard({
   // Determine the question state based on the current exercise and feedback visibility
   if (currentExercise.selectedOption === null) {
     questionState = "unanswered";
-  } else if (!showFeedback) {
+  } else if (showFeedback === false) {
     questionState = "answered";
   } else if (currentExercise.answeredCorrectly === true) {
     questionState = "correct";
@@ -68,7 +68,7 @@ export default function RephrasingExerciseCard({
                 const isSelected = selectedAnswer === option;
                 let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
                 if (isSelected) {
-                  if (showFeedback) {
+                  if (showFeedback||showFeedback===null ) {
                     if (currentExercise.answeredCorrectly === true) {
                       buttonClass +=
                         " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
@@ -81,13 +81,18 @@ export default function RephrasingExerciseCard({
                       " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                   }
                 }
+                if (showFeedback && option == currentExercise.correctOption) {
+                buttonClass +=
+                  " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
+              }
+
                 return (
                   <Button
                     key={index}
                     variant="outline"
                     className={buttonClass}
                     onClick={() => handleAnswerSelect(option)}
-                    disabled={isSelected}
+                    disabled={isSelected ||showFeedback===true}
                   >
                     {option}
                     {isSelected && questionState === "correct" && (
@@ -102,7 +107,7 @@ export default function RephrasingExerciseCard({
           </div>
 
           {/* feedback */}
-          {selectedAnswer && (
+          {selectedAnswer && !showFeedback&& (
             <div className="mt-6 flex items-center gap-4">
               {questionState === "correct" && (
                 <p className="text-green-500 dark:text-green-400 font-medium">
@@ -135,7 +140,7 @@ export default function RephrasingExerciseCard({
             </Button>
           </div>
         )}
-        {currentExercise.order - 1 > 0 &&(
+          {currentExercise.order !== totalQuestions && (
           <div className="ml-auto">
             <Button variant="outline" onClick={handleNextExercise}>
               Next Question <ArrowRight className="ml-2 h-4 w-4" />

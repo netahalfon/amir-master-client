@@ -13,7 +13,7 @@ import {
 import { QuestionData, QuestionState } from "@/types/chapter-types";
 
 interface ReadingExerciseCardProps {
-  showFeedback: boolean;
+  showFeedback: boolean | null;
   currentExercise: QuestionData;
   totalQuestions: number;
   handleAnswerSelect: (option: string) => void;
@@ -39,7 +39,7 @@ export default function ReadingExerciseCard({
   // Determine the question state based on the current exercise and feedback visibility
   if (currentExercise.selectedOption === null) {
     questionState = "unanswered";
-  } else if (!showFeedback) {
+  } else if (showFeedback === false) {
     questionState = "answered";
   } else if (currentExercise.answeredCorrectly === true) {
     questionState = "correct";
@@ -56,7 +56,6 @@ export default function ReadingExerciseCard({
 
   return (
     <div className="flex gap-4 items-start">
-
       {/* card 1 – passage with scroll */}
       <Card className="w-1/2 border-2 py-3 h-[500px] overflow-y-auto">
         <CardContent>
@@ -78,7 +77,7 @@ export default function ReadingExerciseCard({
                 const isSelected = selectedAnswer === option;
                 let buttonClass = "justify-start h-auto py-3 px-4 !opacity-100";
                 if (isSelected) {
-                  if (showFeedback) {
+                  if (showFeedback || showFeedback === null) {
                     if (currentExercise.answeredCorrectly === true) {
                       buttonClass +=
                         " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
@@ -91,13 +90,18 @@ export default function ReadingExerciseCard({
                       " bg-blue-100 border-blue-500 dark:bg-blue-900 dark:text-400 dark:border-blue-700";
                   }
                 }
+                if (showFeedback && option == currentExercise.correctOption) {
+                  buttonClass +=
+                    " bg-green-100 border-green-500 dark:bg-green-900 dark:text-400 dark:border-green-700";
+                }
+
                 return (
                   <Button
                     key={index}
                     variant="outline"
                     className={buttonClass}
                     onClick={() => handleAnswerSelect(option)}
-                    disabled={isSelected}
+                    disabled={isSelected || showFeedback === true}
                   >
                     {option}
                     {isSelected && questionState === "correct" && (
@@ -110,17 +114,8 @@ export default function ReadingExerciseCard({
                 );
               })}
             </div>
-          </div>
-        </CardContent>
-        <CardFooter className="relative flex w-full items-center justify-between px-4 py-3">
-          {currentExercise.order - 1 > 0 && (
-            <Button variant="outline" onClick={handlePreviousExercise}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-          )}
-
-          {selectedAnswer && (
-            <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4">
+            {selectedAnswer && !showFeedback&& (
+            <div className="mt-6 flex items-center gap-4">
               {questionState === "correct" && (
                 <p className="text-green-500 dark:text-green-400 font-medium">
                   Correct!
@@ -131,6 +126,7 @@ export default function ReadingExerciseCard({
                   Try again.
                 </p>
               )}
+
               <Button
                 variant="ghost"
                 className="text-muted-foreground flex items-center gap-2"
@@ -140,13 +136,27 @@ export default function ReadingExerciseCard({
               </Button>
             </div>
           )}
+          </div>
+        </CardContent>
 
-          {currentExercise.order - 1 > 0 && (
-            <Button variant="outline" onClick={handleNextExercise}>
-              <ArrowRight className="h-4 w-4" />
+        <CardFooter className="flex w-full items-center">
+        {currentExercise.order - 1 > 0 && (
+          <div className="mr-auto">
+            <Button variant="outline" onClick={handlePreviousExercise}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Previous Question
             </Button>
-          )}
-        </CardFooter>
+          </div>
+        )}
+          {currentExercise.order !== totalQuestions && (
+          <div className="ml-auto">
+            <Button variant="outline" onClick={handleNextExercise}>
+              Next Question
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        )}
+      </CardFooter>
       </Card>
     </div>
   );

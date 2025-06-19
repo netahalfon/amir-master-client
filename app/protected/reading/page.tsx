@@ -224,7 +224,7 @@ export default function Reading() {
               handleReset={handleReset}
               handlePreviousExercise={handlePreviousExercise}
               handleNextExercise={handleNextExercise}
-              showFeedback={true}
+              showFeedback={null}
               totalQuestions={filteredExercises.length}
             />
           ) : (
