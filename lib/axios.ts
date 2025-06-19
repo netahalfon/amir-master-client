@@ -13,6 +13,7 @@ export const REQUESTS = {
   REFRESH_TOKEN: "/user/refreshToken",
   // word bank
   GET_WORDS: "/wordBank",
+  GET_WORDS_WITH_MASTERY: "/wordBank//with-mastery",
   // user progress
   GET_USER_PROGRESS: "/user/progress",
   UPSERT_MASTERY: "/user/progress/upsert-mastery",

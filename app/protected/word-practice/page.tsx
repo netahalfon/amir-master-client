@@ -25,7 +25,7 @@ const masteryOptions = ["None", "Don't Know", "Partially Know", "Know Well"];
 const levelOptions = Array.from({ length: 10 }, (_, i) => i + 1);
 
 export default function WordPractice() {
-  const { getWordBank, getWordMasteries, upsertMastery } = useApi();
+  const { getWordsWithMastery, upsertMastery } = useApi();
 
   const [words, setWords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,23 +46,7 @@ export default function WordPractice() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const [wordsRes, masteryRes] = await Promise.all([
-          getWordBank(),
-          getWordMasteries(),
-        ]);
-        const items = Array.isArray(masteryRes)
-          ? masteryRes
-          : masteryRes.masteries ?? [];
-
-        const map = new Map<string, string>();
-        items.forEach((m: any) => {
-          map.set(m.wordId, m.mastery);
-        });
-        // combine
-        const combined = wordsRes.map((w: any) => ({
-          ...w,
-          mastery: map.get(w._id) || "None",
-        }));
+        const combined = await getWordsWithMastery()
         setWords(combined);
       } catch (err) {
         console.error("Failed to fetch words or masteries:", err);
