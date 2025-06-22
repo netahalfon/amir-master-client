@@ -16,6 +16,7 @@ export const REQUESTS = {
   GET_WORDS_WITH_MASTERY: "/wordBank//with-mastery",
   // user progress
   GET_USER_PROGRESS: "/user/progress",
+  GET_USER_PROGRESS_SUMMARY: "/user/progress/summary",
   UPSERT_MASTERY: "/user/progress/upsert-mastery",
   UPSERT_ANSWERED_QUESTION: "/user/progress/upsert-answered-question",
   UPSERT_SIMULATION_GRADE: "/user/progress/upsert-simulation-grade",

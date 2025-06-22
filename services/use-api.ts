@@ -8,6 +8,11 @@ export const useApi = () => {
     return data;
   };
 
+  const getUserProgressSummary = async () => {
+    const { data } = await axiosInstance.get(REQUESTS.GET_USER_PROGRESS_SUMMARY);
+    return data;
+  };
+
   //word-notebook && word-practice
   const getWordBank = async () => {
     const { data } = await axiosInstance.get(REQUESTS.GET_WORDS);
@@ -113,6 +118,7 @@ export const useApi = () => {
 
   return {
     getUserProgress,
+    getUserProgressSummary,
     getWordBank,
     getWordMasteries,
     getWordsWithMastery,

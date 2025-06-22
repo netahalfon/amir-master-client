@@ -5,7 +5,6 @@ export interface SimulationGradeResult {
   totalQuestions: number;
 }
 
-
 export type QuestionState = "unanswered" | "correct" | "incorrect" | "answered";
 
 export interface QuestionData {
@@ -33,4 +32,10 @@ export interface QuestionData {
   chaptersSection1: ChapterData[];
   chaptersSection2: ChapterData[];
 }
-  
+
+export type ProgressSummary ={
+  vocabularyByLevel: { level: number; count: number; mastered: number; learning: number }[];
+   masteryDistribution: { name: string; value: number }[];
+  practiceStats: { name: string; correct: number; incorrect: number }[];
+  simulationScores: { date: string; score: number }[];
+}
