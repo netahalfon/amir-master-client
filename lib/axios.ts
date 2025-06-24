@@ -6,6 +6,7 @@ export const REQUESTS = {
   // auth
   GET_USER_INFO: "/user/userInfo",
   LOGIN: "/user/login",
+  GOOGLE_LOGIN: "/user/google-login",
   LOGOUT: "/user/logout",
   SIGNUP: "/user/signUp",
   FORGOT_PASSWORD: "/user/forgotPassword",
