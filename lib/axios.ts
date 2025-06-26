@@ -4,14 +4,15 @@ import { useRouter } from "next/router";
 
 export const REQUESTS = {
   // auth
-  GET_USER_INFO: "/user/userInfo",
+   GET_USER_INFO: "/user/user-info",
   LOGIN: "/user/login",
   GOOGLE_LOGIN: "/user/google-login",
+  GOOGLE_SIGNUP: "/user/google-signup",
   LOGOUT: "/user/logout",
-  SIGNUP: "/user/signUp",
-  FORGOT_PASSWORD: "/user/forgotPassword",
-  RESET_PASSWORD: "/user/resetPassword",
-  REFRESH_TOKEN: "/user/refreshToken",
+  SIGNUP: "/user/signup",
+  FORGOT_PASSWORD: "/user/forgot-password",
+  RESET_PASSWORD: "/user/reset-password",
+  REFRESH_TOKEN: "/user/refresh-token",
   // word bank
   GET_WORDS: "/wordBank",
   GET_WORDS_WITH_MASTERY: "/wordBank//with-mastery",

@@ -69,18 +69,6 @@ export default function WordNotebook() {
   setCurrentPage(1);
 }, [searchText, levelFilter, masteryFilter]);
 
-  // filter words
-  // const filteredWords = words.filter((w) => {
-  //   const matchesSearch =
-  //     w.english.toLowerCase().includes(searchText.toLowerCase()) ||
-  //     w.hebrew.includes(searchText);
-  //   const matchesLevel =
-  //     levelFilter === "all" || w.level === Number(levelFilter);
-  //   const matchesMastery =
-  //     masteryFilter === "all" || w.mastery === masteryFilter;
-  //   return matchesSearch && matchesLevel && matchesMastery;
-  // });
-
   const filteredWords = useMemo(() => {
   return words.filter((w) => {
     const matchesSearch =

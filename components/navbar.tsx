@@ -9,10 +9,8 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import LogoutModal from "@/components/logout-modal";
-import axiosInstance, { REQUESTS } from "@/lib/axios"
+import axiosInstance, { REQUESTS } from "@/lib/axios";
 import { useRouter } from "next/navigation";
-
-
 
 const navItems = [
   { name: "Dashboard", href: "/" },
@@ -49,6 +47,7 @@ export default function Navbar() {
   const handleCancelLogout = () => {
     setShowLogoutModal(false);
   };
+  const isAuthPage = pathname.startsWith("/auth");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-blue-950 dark:bg-blue-900">
@@ -66,42 +65,43 @@ export default function Navbar() {
             <span className="text-xl font-bold text-white">AmirMaster</span>
           </Link>
         </div>
-
-        {/* תפריט למסכים גדולים */}
-        <nav className="hidden lg:flex items-center gap-6">
-          <>
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-white/80",
-                  pathname === item.href ? "text-white" : "text-white/60"
-                )}
+        {/* תפריט למסכים גדולים */}\
+        {!isAuthPage && (
+          <nav className="hidden lg:flex items-center gap-6">
+            <>
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-white/80",
+                    pathname === item.href ? "text-white" : "text-white/60"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <button
+                onClick={handleLogoutButton}
+                className="text-sm font-medium text-white/60 hover:text-white/80 transition-colors"
               >
-                {item.name}
-              </Link>
-            ))}
-            <button
-              onClick={handleLogoutButton}
-              className="text-sm font-medium text-white/60 hover:text-white/80 transition-colors"
-            >
-              Log out
-            </button>
-          </>
-        </nav>
-
+                Log out
+              </button>
+            </>
+          </nav>
+        )}
         {/* כפתור המבורגר למסכים קטנים */}
-        <div className="flex items-center gap-4 lg:hidden">
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="text-white"
-            aria-label="Toggle Menu"
-          >
-            {menuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-
+        {!isAuthPage && (
+          <div className="flex items-center gap-4 lg:hidden">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-white"
+              aria-label="Toggle Menu"
+            >
+              {menuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
+        )}
         {/* תפריט צדדי (נפתח/נסגר) */}
         {menuOpen && (
           <div className="absolute top-16 left-0 w-full bg-blue-950 dark:bg-blue-900 flex flex-col items-start gap-4 px-6 py-4 lg:hidden shadow-lg">
@@ -126,14 +126,12 @@ export default function Navbar() {
             </button>
           </div>
         )}
-
         {showLogoutModal && (
           <LogoutModal
             onConfirm={handleConfirmLogout}
             onCancel={handleCancelLogout}
           />
         )}
-
         {/* מצב כהה */}
         <div className="hidden lg:flex items-center gap-4">
           <ModeToggle />

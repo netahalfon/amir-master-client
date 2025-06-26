@@ -12,7 +12,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,10 +30,7 @@ export default function LoginPage() {
         email,
         password,
       });
-
-      // setAuth(res.data)
-
-      router.push("/")
+      router.push("/");
       console.log("Login successful:", res.data);
     } catch (err) {
       console.error("Login error:", err);
@@ -140,7 +137,28 @@ export default function LoginPage() {
               </div>
             </div>
             <div className="mt-4">
-              <GoogleSignInButton />
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    setIsLoading(true);
+                    const res = await axiosInstance.post(REQUESTS.GOOGLE_LOGIN, {
+                        id_token: credentialResponse.credential, 
+                      }
+                    );
+
+                    // ניתוב לדף הבית או שמירה של משתמש, תלוי איך את מנהלת אוטנטיקציה
+                    router.push("/");
+                  } catch (err) {
+                    console.error("Google login failed:", err);
+                    alert("Google login failed");
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                onError={() => {
+                  alert("Login Failed");
+                }}
+              />
             </div>
           </div>
           <CardFooter className="flex justify-center">

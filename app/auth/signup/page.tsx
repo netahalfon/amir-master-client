@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import  { useState } from "react"
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
@@ -10,9 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
-import axiosInstance,{ REQUESTS } from "@/lib/axios";
-
+import axiosInstance, { REQUESTS } from "@/lib/axios";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -139,7 +138,40 @@ export default function SignUpPage() {
               </div>
             </div>
             <div className="mt-4">
-              <GoogleSignInButton />
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  try {
+                    setIsLoading(true);
+                    const res = await axiosInstance.post(
+                      REQUESTS.GOOGLE_SIGNUP,
+                      {
+                        id_token: credentialResponse.credential,
+                      }
+                    );
+
+                    // ניתוב לדף הבית או שמירה של משתמש, תלוי איך את מנהלת אוטנטיקציה
+                    router.push("/");
+                  } catch (err: any) {
+                    if (
+                      err.response?.status === 400 &&
+                      err.response?.data?.message?.includes(
+                        "User already exists"
+                      )
+                    ) {
+                      alert("User already exists. Please log in instead.");
+                      router.push("/auth/login"); // או כל דף התחברות
+                    } else {
+                      alert("Signup failed");
+                    }
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                onError={() => {
+                  alert("Login Failed");
+                }}
+                text="signup_with"
+              />
             </div>
           </div>
           <CardFooter className="flex justify-center">
