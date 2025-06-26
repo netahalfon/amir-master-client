@@ -54,7 +54,7 @@ export default function WordNotebook() {
       try {
         const combined = await getWordsWithMastery();
         setWords(combined);
-        } catch (err) {
+      } catch (err) {
         console.error("Failed to fetch words or masteries:", err);
         setError("Failed to load words.");
       } finally {
@@ -64,23 +64,27 @@ export default function WordNotebook() {
 
     fetchData();
   }, []);
-  
+
   useEffect(() => {
-  setCurrentPage(1);
-}, [searchText, levelFilter, masteryFilter]);
+    setCurrentPage(1);
+  }, [searchText, levelFilter, masteryFilter]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   const filteredWords = useMemo(() => {
-  return words.filter((w) => {
-    const matchesSearch =
-      w.english.toLowerCase().includes(searchText.toLowerCase()) ||
-      w.hebrew.includes(searchText);
-    const matchesLevel =
-      levelFilter === "all" || w.level === Number(levelFilter);
-    const matchesMastery =
-      masteryFilter === "all" || w.mastery === masteryFilter;
-    return matchesSearch && matchesLevel && matchesMastery;
-  });
-}, [words, searchText, levelFilter, masteryFilter]);
+    return words.filter((w) => {
+      const matchesSearch =
+        w.english.toLowerCase().includes(searchText.toLowerCase()) ||
+        w.hebrew.includes(searchText);
+      const matchesLevel =
+        levelFilter === "all" || w.level === Number(levelFilter);
+      const matchesMastery =
+        masteryFilter === "all" || w.mastery === masteryFilter;
+      return matchesSearch && matchesLevel && matchesMastery;
+    });
+  }, [words, searchText, levelFilter, masteryFilter]);
 
   const paginatedWords = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
