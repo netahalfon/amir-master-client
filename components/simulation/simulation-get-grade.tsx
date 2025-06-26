@@ -29,15 +29,6 @@ export default function SimulationGetGrade({
         <Progress value={progress} className="h-3" />
       </div>
 
-      <div className="grid gap-4 w-full max-w-md mb-8">
-        <div className="flex justify-between p-3 bg-muted rounded-md">
-          <span className="font-medium">Questions answered:</span>
-          <span>
-            {gradeResult?.totalQuestions} / {44}
-          </span>
-        </div>
-      </div>
-
       <div className="flex gap-4">
         <Button onClick={onBackToMenu} size="lg">
           Start New Simulation
