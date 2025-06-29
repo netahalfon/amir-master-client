@@ -6,6 +6,8 @@ import { SimulationBar } from "@/components/simulation/simulation-bar";
 import CompletionExerciseCard from "@/components/completion-exercise-card";
 import RephrasingExerciseCard from "../rephrasing-exercise-card";
 import ReadingExerciseCard from "../reading-exercise-card";
+import { Button } from "@/components/ui/button";
+
 interface SimulationReviewProps {
   onBackToMenu: () => void;
   simulationData: SimulationData | null;
@@ -85,12 +87,19 @@ export default function SimulationReview({
   };
 
   return (
-    <div className="text-center py-12">
-      <h3 className="text-2xl font-bold mb-4"> Score: {gradeResult?.grade}</h3>
+    <div className="text-center py-0">
+      <div className="flex items-center justify-between py-4 px-4 mb-6">
+        <h3 className="text-xl font-bold">Score: {gradeResult?.grade}</h3>
+        <Button onClick={onBackToMenu} size="lg">
+          Back to Simulations Menu
+        </Button>
+      </div>
+
       <div className="flex flex-col md:flex-row items-center justify-start gap-4 mb-6 text-left">
         <div className="text-lg font-medium text-muted-foreground">
           Section 1:
         </div>
+
         <SimulationBar
           showFeedback={true}
           currentQuestionIndex={
@@ -151,13 +160,6 @@ export default function SimulationReview({
           totalQuestions={22}
         />
       )}
-
-      <button
-        onClick={onBackToMenu}
-        className="bg-muted px-4 py-2 rounded border"
-      >
-        Back to Simulations Menu
-      </button>
     </div>
   );
 }

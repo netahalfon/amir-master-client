@@ -28,7 +28,6 @@ import type {
   ChapterData,
   QuestionData,
 } from "@/types/chapter-types";
-import { set } from "date-fns";
 
 export default function Simulations() {
   const {
