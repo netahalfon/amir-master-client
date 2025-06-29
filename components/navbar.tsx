@@ -65,7 +65,7 @@ export default function Navbar() {
             <span className="text-xl font-bold text-white">AmirMaster</span>
           </Link>
         </div>
-        {/* תפריט למסכים גדולים */}\
+        {/* תפריט למסכים גדולים */}
         {!isAuthPage && (
           <nav className="hidden lg:flex items-center gap-6">
             <>
