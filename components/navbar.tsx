@@ -32,6 +32,7 @@ export default function Navbar() {
 
   const handleLogoutButton = () => {
     setShowLogoutModal(true);
+    setMenuOpen(false);
   };
 
   const handleConfirmLogout = async () => {
