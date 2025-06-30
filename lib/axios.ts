@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 
 export const REQUESTS = {
   // auth
-   GET_USER_INFO: "/user/user-info",
+  GET_USER_INFO: "/user/user-info",
+  GET_GOOGLE_CLIENT_ID: "/user/google-configurations",
   LOGIN: "/user/login",
   GOOGLE_LOGIN: "/user/google-login",
   GOOGLE_SIGNUP: "/user/google-signup",
