@@ -30,10 +30,10 @@ export const REQUESTS = {
   GET_SIMULATIONS_OPTIONS: "/simulation/",
   GET_SIMULATION_BY_ID: "/simulation/",
   GET_SIMULATION_GRADE_BY_ID: "/simulation/get-grade/",
-
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+console.log("👉 baseURL:", BASE_URL);
 
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -72,7 +72,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         await axiosInstance.get(REQUESTS.REFRESH_TOKEN);
-        requestsQueue.forEach(cb => cb());
+        requestsQueue.forEach((cb) => cb());
         requestsQueue = [];
         return axiosInstance(originalRequest);
       } catch (err) {
@@ -80,7 +80,7 @@ axiosInstance.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
-    }else if (error.response?.status === 401) {
+    } else if (error.response?.status === 401) {
       // Handle 401 Unauthorized error
       // This could be a redirect to login or showing an error message
       console.error("Unauthorized access - redirecting to login");
