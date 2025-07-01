@@ -136,13 +136,15 @@ export default function LoginPage() {
                 </span>
               </div>
             </div>
-            <div className="mt-4">
+            <div className="mt-4 flex justify-center">
               <GoogleLogin
                 onSuccess={async (credentialResponse) => {
                   try {
                     setIsLoading(true);
-                    const res = await axiosInstance.post(REQUESTS.GOOGLE_LOGIN, {
-                        id_token: credentialResponse.credential, 
+                    const res = await axiosInstance.post(
+                      REQUESTS.GOOGLE_LOGIN,
+                      {
+                        id_token: credentialResponse.credential,
                       }
                     );
 
