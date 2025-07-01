@@ -16,7 +16,7 @@ export const REQUESTS = {
   REFRESH_TOKEN: "/user/refresh-token",
   // word bank
   GET_WORDS: "/wordBank",
-  GET_WORDS_WITH_MASTERY: "/wordBank//with-mastery",
+  GET_WORDS_WITH_MASTERY: "/wordBank/with-mastery",
   // user progress
   GET_USER_PROGRESS: "/user/progress",
   GET_USER_PROGRESS_SUMMARY: "/user/progress/summary",
@@ -32,7 +32,7 @@ export const REQUESTS = {
   GET_SIMULATION_GRADE_BY_ID: "/simulation/get-grade/",
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = "/api"//process.env.NEXT_PUBLIC_API_BASE_URL;
 console.log("👉 baseURL:", BASE_URL);
 
 const axiosInstance = axios.create({

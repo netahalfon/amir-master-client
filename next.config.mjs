@@ -9,6 +9,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  rewrites: async () => [
+    {
+      source: '/api/:path*',
+      destination: 'https://amir-master-server.onrender.com/api/:path*',
+    },
+  ],
 }
 
 export default nextConfig
