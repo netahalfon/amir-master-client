@@ -12,7 +12,7 @@ const nextConfig = {
   rewrites: async () => [
     {
       source: '/api/:path*',
-      destination: 'https://amir-master-server.onrender.com/api/:path*',
+        destination: `${process.env.SERVER_URL}/api/:path*`,
     },
   ],
 }
