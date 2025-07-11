@@ -49,9 +49,9 @@ export default function WordPractice() {
         setWords(combined);
       } catch (error) {
         console.error("Failed to fetch words or masteries:", error);
-        if(error instanceof AxiosError && error?.response?.status === 401) {
-                  router.push("/auth/login");
-                }
+        if (error instanceof AxiosError && error?.response?.status === 401) {
+          router.push("/auth/login");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -59,18 +59,6 @@ export default function WordPractice() {
 
     fetchData();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (words.length === 0) {
-    return <></>;
-  }
 
   // filter words
   const filteredWords = words.filter((w) => {
@@ -146,6 +134,18 @@ export default function WordPractice() {
     const opts = getMultipleChoiceOptions();
     setChoices(opts);
   }, [currentWord, words]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (words.length === 0) {
+    return <></>;
+  }
 
   const handleNextWord = () => {
     setCurrentWordIndex((prevIndex) =>

@@ -65,18 +65,6 @@ export default function WordNotebook() {
     fetchData();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (words.length === 0) {
-    return <></>;
-  }
-
   useEffect(() => {
     setCurrentPage(1);
   }, [searchText, levelFilter, masteryFilter]);
@@ -102,6 +90,18 @@ export default function WordNotebook() {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredWords.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredWords, currentPage]);
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (words.length === 0) {
+    return <></>;
+  }
 
   // handle mastery update
   const handleMasteryChange = async (wordId: string, newMastery: string) => {

@@ -64,9 +64,9 @@ export default function Reading() {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        if(error instanceof AxiosError && error?.response?.status === 401) {
-                  router.push("/auth/login");
-                }
+        if (error instanceof AxiosError && error?.response?.status === 401) {
+          router.push("/auth/login");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -74,18 +74,6 @@ export default function Reading() {
 
     fetchInitialData();
   }, []);
-
-   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (chaptersData.length === 0) {
-        return <></>;
-  }
 
   const filteredChapter: ChapterData | undefined =
     selectedChapter && selectedChapter !== "all"
@@ -133,6 +121,18 @@ export default function Reading() {
       }
     }
   }, [selectedChapter]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (chaptersData.length === 0) {
+    return <></>;
+  }
 
   const handleAnswerSelect = async (answer: string) => {
     if (!currentExercise) return;
@@ -200,8 +200,6 @@ export default function Reading() {
     if (q.answeredCorrectly === false) return "incorrect";
     return "unanswered";
   });
-
- 
 
   return (
     <div className="container py-8">

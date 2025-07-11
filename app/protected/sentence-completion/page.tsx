@@ -73,17 +73,6 @@ export default function SentenceCompletion() {
     fetchInitialData();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (chaptersData.length === 0) {
-    return <></>;
-  }
 
   const filteredChapter: ChapterData | undefined =
     selectedChapter && selectedChapter !== "all"
@@ -128,6 +117,18 @@ export default function SentenceCompletion() {
       console.error("Failed to save answer:", err);
     }
   };
+  
+    if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (chaptersData.length === 0) {
+    return <></>;
+  }
 
   const handleReset = async () => {
     if (!currentExercise) return;

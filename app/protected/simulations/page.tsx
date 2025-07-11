@@ -61,27 +61,15 @@ export default function Simulations() {
         console.log("Fetched simulations:", simulations);
       } catch (error) {
         console.error("Error fetching simulations:", error);
-         if(error instanceof AxiosError && error?.response?.status === 401) {
-                  router.push("/auth/login");
-                }
+        if (error instanceof AxiosError && error?.response?.status === 401) {
+          router.push("/auth/login");
+        }
       } finally {
         setIsLoading(false); // ← חובה כאן
       }
     };
     fetchSimulationOptions();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (simulationOptions.length === 0) {
-        return <></>;
-  }
 
   const startSimulation = async () => {
     //start sec 1
@@ -174,6 +162,18 @@ export default function Simulations() {
       getGrade();
     }
   }, [simulationStage]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (simulationOptions.length === 0) {
+    return <></>;
+  }
 
   return (
     <div className="container py-8">

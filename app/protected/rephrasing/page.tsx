@@ -75,18 +75,6 @@ export default function Rephrasing() {
     fetchInitialData();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
-      </div>
-    );
-  }
-
-  if (chaptersData.length === 0) {
-    return <></>;
-  }
-
   const filteredChapter: ChapterData | undefined =
     selectedChapter && selectedChapter !== "all"
       ? chaptersData.find((ch) => ch.order === Number.parseInt(selectedChapter))
@@ -115,6 +103,18 @@ export default function Rephrasing() {
         : null
     );
   }, [currentExerciseIndex, selectedChapter]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (chaptersData.length === 0) {
+    return <></>;
+  }
 
   const handleAnswerSelect = async (answer: string) => {
     if (!currentExercise) return;
