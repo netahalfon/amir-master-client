@@ -31,12 +31,18 @@ import {
 import { useApi } from "@/services/use-api";
 import { useEffect, useState } from "react";
 import type { ProgressSummary } from "@/types/chapter-types";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
+
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 export default function Progress() {
   const { getUserProgressSummary } = useApi();
   const [summary, setSummary] = useState<ProgressSummary | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,18 +51,27 @@ export default function Progress() {
         setSummary(data);
       } catch (error) {
         console.error("Error fetching progress summary:", error);
+        if(error instanceof AxiosError && error?.response?.status === 401) {
+          router.push("/auth/login");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (!summary)
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
       </div>
     );
+  }
+  if(!summary) {
+    return <></>;
+  }
 
   return (
     <div className="container py-8">

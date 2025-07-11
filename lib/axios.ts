@@ -32,7 +32,7 @@ export const REQUESTS = {
   GET_SIMULATION_GRADE_BY_ID: "/simulation/get-grade/",
 };
 
-const BASE_URL = "/api"//process.env.NEXT_PUBLIC_API_BASE_URL;
+const BASE_URL = "/api";
 console.log("👉 baseURL:", BASE_URL);
 
 const axiosInstance = axios.create({
@@ -58,8 +58,7 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (error.response?.status === 401 && !(originalRequest.url == REQUESTS.REFRESH_TOKEN)) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           requestsQueue.push(() => {
@@ -80,14 +79,7 @@ axiosInstance.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
-    } else if (error.response?.status === 401) {
-      // Handle 401 Unauthorized error
-      // This could be a redirect to login or showing an error message
-      console.error("Unauthorized access - redirecting to login");
-      const router = useRouter();
-      router.push("/auth/login");
     }
-
     return Promise.reject(error);
   }
 );

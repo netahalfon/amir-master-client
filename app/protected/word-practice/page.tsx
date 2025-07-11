@@ -20,6 +20,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, RotateCcw, CheckCircle, XCircle } from "lucide-react";
 import { useApi } from "@/services/use-api";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 const masteryOptions = ["None", "Don't Know", "Partially Know", "Know Well"];
 const levelOptions = Array.from({ length: 10 }, (_, i) => i + 1);
@@ -29,28 +31,27 @@ export default function WordPractice() {
 
   const [words, setWords] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [masteryFilter, setMasteryFilter] = useState<string>("all");
-
   const [practiceMode, setPracticeMode] = useState<string>("flashcards");
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [choices, setChoices] = useState<string[]>([]);
   const [showAnswer, setShowAnswer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const router = useRouter();
 
   // fetch words and user masteries
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
       try {
-        const combined = await getWordsWithMastery()
+        const combined = await getWordsWithMastery();
         setWords(combined);
-      } catch (err) {
-        console.error("Failed to fetch words or masteries:", err);
-        setError("Failed to load words.");
+      } catch (error) {
+        console.error("Failed to fetch words or masteries:", error);
+        if(error instanceof AxiosError && error?.response?.status === 401) {
+                  router.push("/auth/login");
+                }
       } finally {
         setIsLoading(false);
       }
@@ -58,6 +59,18 @@ export default function WordPractice() {
 
     fetchData();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (words.length === 0) {
+    return <></>;
+  }
 
   // filter words
   const filteredWords = words.filter((w) => {
@@ -81,7 +94,7 @@ export default function WordPractice() {
       console.log("Mastery updated successfully in the frontend");
     } catch (err) {
       console.error(err);
-      setError("Failed to update mastery.");
+      console.log("Failed to update mastery.");
     }
   };
   const currentWord = filteredWords[currentWordIndex];

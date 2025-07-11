@@ -26,25 +26,26 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { ProgressBar, QuestionState } from "@/components/progress-bar";
-
+import { useRouter } from "next/navigation";
 import { useApi } from "@/services/use-api";
 import type { ChapterData, QuestionData } from "@/types/chapter-types";
 import RephrasingExerciseCard from "@/components/rephrasing-exercise-card";
+import { AxiosError } from "axios";
 
 export default function Rephrasing() {
   const { getChaptersByType, upsertAnsweredQuestion } = useApi();
 
   const [chaptersData, setChaptersData] = useState<ChapterData[]>([]);
-
   const [selectedChapter, setSelectedChapter] = useState<string>("");
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-
   const [chapterOptions, setChapterOptions] = useState<
     { id: number; name: string }[]
   >([]);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [options, setOptions] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -61,12 +62,30 @@ export default function Rephrasing() {
         if (!selectedChapter && chapters.length > 0) {
           setSelectedChapter(chapters[0].order.toString());
         }
-      } catch (err) {
-        console.error("Error fetching data:", err);
+      } catch (error) {
+        console.error("Error fetching progress summary:", error);
+        if (error instanceof AxiosError && error?.response?.status === 401) {
+          router.push("/auth/login");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
+
     fetchInitialData();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (chaptersData.length === 0) {
+    return <></>;
+  }
 
   const filteredChapter: ChapterData | undefined =
     selectedChapter && selectedChapter !== "all"

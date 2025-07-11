@@ -20,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import SimulationSection from "@/components/simulation/simulation-section";
 import SimulationGetGrade from "@/components/simulation/simulation-get-grade";
 import SimulationReview from "@/components/simulation/simulation-review";
-
 import { useApi } from "@/services/use-api";
 import type {
   SimulationData,
@@ -28,6 +27,8 @@ import type {
   ChapterData,
   QuestionData,
 } from "@/types/chapter-types";
+import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 
 export default function Simulations() {
   const {
@@ -46,11 +47,11 @@ export default function Simulations() {
   const [simulationStage, setSimulationStage] = useState<
     null | "section1" | "section2" | "get grade" | "review"
   >(null);
-
-
   const [gradeResult, setGradeResult] = useState<SimulationGradeResult | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSimulationOptions = async () => {
@@ -58,12 +59,29 @@ export default function Simulations() {
         const simulations = await getSimulationOptions();
         setSimulationOptions(simulations);
         console.log("Fetched simulations:", simulations);
-      } catch (err) {
-        console.error("Error fetching simulations:", err);
+      } catch (error) {
+        console.error("Error fetching simulations:", error);
+         if(error instanceof AxiosError && error?.response?.status === 401) {
+                  router.push("/auth/login");
+                }
+      } finally {
+        setIsLoading(false); // ← חובה כאן
       }
     };
     fetchSimulationOptions();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-blue-500" />
+      </div>
+    );
+  }
+
+  if (simulationOptions.length === 0) {
+        return <></>;
+  }
 
   const startSimulation = async () => {
     //start sec 1
@@ -223,7 +241,7 @@ export default function Simulations() {
           onBackToMenu={() => returnToMenu()}
         />
       ) : simulationStage == "review" ? (
-        <SimulationReview 
+        <SimulationReview
           simulationData={simulationData}
           gradeResult={gradeResult}
           onBackToMenu={() => returnToMenu()}
